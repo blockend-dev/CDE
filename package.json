@@ -1,0 +1,19 @@
+{
+  "name": "cde",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Corroboration Differential Engine research harness",
+  "main": "cde/phase1/runExperiment.js",
+  "scripts": {
+    "test:phase0": "node cde/test/phase0.test.js",
+    "test:phase1": "node cde/test/phase1.test.js",
+    "test:phase2": "node cde/test/phase2.test.js",
+    "test:precondition": "node research/weekend-informativeness/selfTest.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  }
+}

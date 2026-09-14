@@ -1,0 +1,6 @@
+{
+  "wallClockStart": "2026-09-19T10:11:52.331Z",
+  "wallClockEnd": "2026-09-19T10:11:52.380Z",
+  "resultId": "8c897c8f1cfb1a027cd7356abc4919b6b565e92ecc9a327680b6128378ba4510",
+  "note": "Wall-clock metadata only — deliberately excluded from the deterministic result.json so repeated runs stay byte-identical."
+}
