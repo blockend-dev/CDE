@@ -114,16 +114,24 @@ function assertToolTracePresent(trial) {
   }
 }
 
+// Provenance markers this harness recognizes as non-live, audited sources:
+// FIXTURE: (Phase 1/2 hand-authored synthetic data) and REPLAY: (Phase 4
+// snapshots rebuilt from the precondition study's already-captured,
+// immutable historical data — see cde/phase4/replaySnapshot.js). Anything
+// else is presumed to be a live/unaudited endpoint string.
+const RECOGNIZED_PROVENANCE_PREFIXES = ['FIXTURE:', 'REPLAY:'];
+
 function assertNotResearchStudyOutput(candidate) {
-  // The research pipeline's raw_dataset.json records have a completely
+  // The research pipeline's raw_dataset.json RAW records have a completely
   // different shape (observation.fridayRef, observation.weekendEndPrice,
-  // metrics.errorReduction, etc.) and use REAL Bitget endpoint strings, not
-  // a "FIXTURE:" marker. Reject on either signal.
+  // metrics.errorReduction, etc.) than a real CDE snapshot and must never be
+  // passed into this harness directly, regardless of provenance marker —
+  // reject on shape first.
   if (candidate && candidate.observation && ('fridayRef' in candidate.observation || 'weekendEndPrice' in candidate.observation)) {
-    throw new Error('Input has the shape of a research/weekend-informativeness precondition-study record, not a CDE snapshot — refusing to use empirical research output as a Phase 1 fixture.');
+    throw new Error('Input has the shape of a research/weekend-informativeness precondition-study record, not a CDE snapshot — refusing to use empirical research output directly as a snapshot.');
   }
-  if (candidate && candidate.provenance && typeof candidate.provenance.bitgetEndpoint === 'string' && !candidate.provenance.bitgetEndpoint.startsWith('FIXTURE:')) {
-    throw new Error(`Input's provenance.bitgetEndpoint ("${candidate.provenance.bitgetEndpoint}") looks like a real Bitget endpoint, not a fixture marker — refusing.`);
+  if (candidate && candidate.provenance && typeof candidate.provenance.bitgetEndpoint === 'string' && !RECOGNIZED_PROVENANCE_PREFIXES.some((p) => candidate.provenance.bitgetEndpoint.startsWith(p))) {
+    throw new Error(`Input's provenance.bitgetEndpoint ("${candidate.provenance.bitgetEndpoint}") looks like a real Bitget endpoint, not a recognized ${RECOGNIZED_PROVENANCE_PREFIXES.join('/')} marker — refusing.`);
   }
 }
 
@@ -139,4 +147,5 @@ module.exports = {
   assertSnapshotProvenancePresent,
   assertToolTracePresent,
   assertNotResearchStudyOutput,
+  RECOGNIZED_PROVENANCE_PREFIXES,
 };
