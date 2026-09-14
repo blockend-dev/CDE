@@ -1,0 +1,37 @@
+{
+  "version": "0.1.0-phase3",
+  "methodologyLockHash": "5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54",
+  "primaryEstimand": "DiD(exposureDelta) = E[exposureDelta|weekend] - E[exposureDelta|weekday]",
+  "primaryOutcome": "exposureDelta",
+  "primaryStatisticalMethod": "two_sided_permutation_test_mean_diff",
+  "primarySecondarySidedTest": "one_sided_permutation_test_mean_diff",
+  "confidenceIntervalMethod": "stratified_percentile_bootstrap",
+  "confidenceLevel": 0.95,
+  "alpha": 0.05,
+  "numPermutations": 10000,
+  "numBootstrapResamples": 10000,
+  "analysisSeed": 424242,
+  "minCompletedPairsPerCondition": 20,
+  "maxAttemptedPairs": 120,
+  "failurePolicy": "pair_level_all_or_nothing_exclude_incomplete",
+  "retryPolicy": "retries_within_one_trial_never_a_new_sample",
+  "secondaryMetricMethods": {
+    "meanAbsExposureDelta": "permutation_test_mean_diff",
+    "meanConfidenceDelta": "permutation_test_mean_diff",
+    "verificationDivergence": "permutation_test_mean_diff",
+    "directionalFlipRate": "fisher_exact_two_sided",
+    "claimAcceptanceRate": "fisher_exact_two_sided"
+  },
+  "multipleComparisonPolicy": "holm_bonferroni_family_of_5_secondary_metrics",
+  "calendarPriorPolicy": "descriptive_wilson_ci_only_no_adjustment",
+  "stratificationPolicy": "exploratory_only_tercile_independent_volatility",
+  "minObservationsPerStratumCell": 10,
+  "stratumNames": [
+    "quiet",
+    "moderate",
+    "volatile"
+  ],
+  "outlierPolicy": "retain_all_no_transform_median_sensitivity_always_reported",
+  "modelScopePolicy": "single_fixed_provider_model_config_per_analysis_version",
+  "contentHash": "43e0479499d286f4dfe06fd8ec4a036941cd3df1ff0b8afeaee423e2e167fdd7"
+}

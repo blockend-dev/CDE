@@ -1,6 +1,16 @@
 # cde/ — Corroboration Differential Engine
 
-Phases 0–2. See `METHODOLOGY.md` for the full locked design.
+Phases 0–3. See `METHODOLOGY.md` for the locked design and
+`analysis/ANALYSIS_PLAN.md` for the pre-registered statistical analysis
+plan.
+
+```
+Phase 0 — methodology/contracts       (cde/lib/, cde/METHODOLOGY.md)
+Phase 1 — deterministic harness       (cde/phase1/)
+Phase 2 — real model boundary         (cde/phase2/)
+Phase 3 — pre-registered analysis     (cde/analysis/)
+Phase 4 — research execution          NOT STARTED
+```
 
 - `lib/` — the Phase 0 contracts (snapshot schema, condition classifier,
   claim-blind baseline, attack corpus, pairing identity, tool manifest,
@@ -14,9 +24,17 @@ Phases 0–2. See `METHODOLOGY.md` for the full locked design.
   pairing, the deterministic test adapter). See `phase1/README.md`.
 - `phase2/` — real Anthropic-backed model adapter plugged into the same
   Phase 1 boundary, plus a single model smoke test. See `phase2/README.md`.
-- `test/` — `phase0.test.js`, `phase1.test.js`, `phase2.test.js`.
+- `analysis/` — the pre-registered statistical analysis plan and its pure
+  implementation (primary/secondary metrics, significance test, CI method,
+  sample-size rule, failure/outlier/stratification policy). Validated only
+  against deterministic synthetic fixtures — never research evidence. See
+  `analysis/ANALYSIS_PLAN.md` and `analysis/README.md`.
+- `test/` — `phase0.test.js`, `phase1.test.js`, `phase2.test.js`,
+  `phase3.test.js`.
 
 This directory does not touch Bitget Demo trading, live trading, or serve
-a UI anywhere. It exists to make the experiment's methodology reproducible
-and prevent it from drifting once real research trials start. Phase 3
-(a research-scale run with statistical analysis) has not been built.
+a UI anywhere. **No research-scale experiment has been run and no
+experimental findings exist yet** — every number produced anywhere under
+`cde/` so far is either a deterministic fixture result or a single,
+explicitly-labeled model smoke test. Phase 4 (executing the analysis plan
+against a real research-scale sample) has not started.
