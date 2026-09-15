@@ -1,0 +1,33 @@
+{
+  "runId": "run-2026-09-19T155659111Z",
+  "startedAtUtc": "2026-09-19T15:56:59.111Z",
+  "methodologyLockHash": "5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54",
+  "analysisLockHash": "43e0479499d286f4dfe06fd8ec4a036941cd3df1ff0b8afeaee423e2e167fdd7",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5",
+  "temperature": 0,
+  "maxTokens": 1024,
+  "maxToolTurns": 8,
+  "retryPolicy": {
+    "maxAttempts": 3,
+    "baseDelayMs": 500
+  },
+  "modelConfigHash": "dcaa87b08218d67b7f1cb2dc7d07a41a7c25bd2a3429d23d345cf6b2e62f694a",
+  "promptVersion": "phase2-prompt-v1",
+  "promptHash": "b6ba3968bc14434f32ac0b2635faff33a958c735fc00e4a1f3f964c7f1af8825",
+  "toolManifestHash": "3a2b1d529644fa4dc87fff63e9da6a54363ffc96b9824fe185e26a530bc73ab8",
+  "attackCorpusHash": "8f56996feed11e6d821592609750b5da8af2622398763ca327487eefa06fae86",
+  "adapterVersion": "phase2-real-model-adapter-0.1.0",
+  "experimentVersion": "phase2-real-model-adapter-0.1.0",
+  "analysisSeed": 424242,
+  "targetMinCompletedPairsPerCondition": 20,
+  "maxAttemptedPairs": 120,
+  "repositoryCommitSha": "6f335c4977c3fa4c58b97c95d4cd5219f28680d2",
+  "workingTreeCleanAtStart": true,
+  "nodeVersion": "v24.11.1",
+  "packageVersions": {
+    "self": "0.1.0",
+    "anthropicSdk": "0.32.1"
+  },
+  "manifestHash": "b1168c9d587b1cffaa56dbc49f34a3e5e6552ff9e36eb7136c363322d997620d"
+}

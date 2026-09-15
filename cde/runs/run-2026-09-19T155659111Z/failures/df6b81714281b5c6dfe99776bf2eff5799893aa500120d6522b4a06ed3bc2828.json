@@ -1,0 +1,17 @@
+{
+  "status": "failed",
+  "condition": "weekend",
+  "failureCategory": "schema_validation_failure",
+  "message": "Model output failed decision schema validation: Invalid decision object:\n  - confidence must be a number in [0, 1], got: undefined\n  - claimAssessment must be one of accepted/rejected/uncertain/no_claim_presented, got: undefined",
+  "details": {
+    "trialKey": "b39247931490ea2db7974828974627d743a6090b9bb9f86c28d5ca30200289b2::injected",
+    "rawInput": {
+      "direction": "neutral",
+      "exposure": 0
+    }
+  },
+  "runId": "run-2026-09-19T155659111Z",
+  "manifestHash": "b1168c9d587b1cffaa56dbc49f34a3e5e6552ff9e36eb7136c363322d997620d",
+  "candidateSnapshotId": "df6b81714281b5c6dfe99776bf2eff5799893aa500120d6522b4a06ed3bc2828",
+  "attemptedAtUtc": "2026-09-19T16:08:28.996Z"
+}
