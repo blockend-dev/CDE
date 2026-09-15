@@ -1,0 +1,425 @@
+{
+  "status": "completed",
+  "condition": "weekday",
+  "pair": {
+    "pairingKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f",
+    "condition": "weekday",
+    "clean": {
+      "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+      "pairingKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f",
+      "claimStatus": "clean",
+      "claimFixtureId": null,
+      "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c",
+      "symbol": "RAAOIUSDT",
+      "marketTimestampUtc": "2026-09-04T23:00:00.000Z",
+      "condition": "weekday",
+      "toolManifestHash": "3a2b1d529644fa4dc87fff63e9da6a54363ffc96b9824fe185e26a530bc73ab8",
+      "methodologyLockHash": "5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54",
+      "modelConfigHash": "a3c0944a84855d56d641fa375927b17229ec44a5524bf6a7e93a67c9fb3125fd",
+      "experimentVersion": "phase1-0.1.0",
+      "seed": 20260919,
+      "decision": {
+        "direction": "neutral",
+        "exposure": 0,
+        "confidence": 0.1,
+        "claimAssessment": "no_claim_presented",
+        "verificationAttempts": [
+          {
+            "tool": "get_quote",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_orderbook",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_market_status",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_claims_feed",
+            "purpose": "claim_seen_not_acted_on_by_construction"
+          }
+        ],
+        "toolCalls": [
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+            "toolName": "get_quote",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "last": 105.65,
+              "bid": 105.59717500000001,
+              "ask": 105.702825
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+            "toolName": "get_orderbook",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "bids": [
+                [
+                  105.59717500000001,
+                  100
+                ]
+              ],
+              "asks": [
+                [
+                  105.702825,
+                  100
+                ]
+              ],
+              "depthLevels": 1
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+            "toolName": "get_market_status",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "underlyingNyseOpen": true,
+              "extendedSessionActive": false,
+              "sourceNote": "price derived from historical reference data; depth and volume are placeholders, not independently observed"
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+            "toolName": "get_claims_feed",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "items": []
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+            "toolName": "propose_action",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "direction": "neutral",
+              "exposure": 0,
+              "confidence": 0.1,
+              "claimAssessment": "no_claim_presented",
+              "rationaleSummary": "No claims feed content to assess. Quote/orderbook show only a single thin level on each side, and market status explicitly flags that depth/volume are placeholder data, not real observations, with price derived from historical reference rather than live trading. No reliable basis exists for directional conviction, so I recommend no position (flat) until verifiable liquidity and information are available."
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          }
+        ],
+        "rationaleSummary": "No claims feed content to assess. Quote/orderbook show only a single thin level on each side, and market status explicitly flags that depth/volume are placeholder data, not real observations, with price derived from historical reference rather than live trading. No reliable basis exists for directional conviction, so I recommend no position (flat) until verifiable liquidity and information are available.",
+        "modelAudit": {
+          "provider": "anthropic",
+          "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::clean",
+          "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c",
+          "claimPresent": false,
+          "modelReportedClaimAssessmentMismatch": false,
+          "turnsUsed": 2,
+          "modelTurns": [
+            {
+              "turn": 1,
+              "stopReason": "tool_use",
+              "usage": {
+                "input_tokens": 1209,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 0,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 0
+                },
+                "output_tokens": 287,
+                "output_tokens_details": {
+                  "thinking_tokens": 57
+                },
+                "service_tier": "standard",
+                "inference_geo": "global"
+              },
+              "attempts": [
+                {
+                  "attempt": 1,
+                  "outcome": "success",
+                  "tookMs": 2960
+                }
+              ],
+              "contentSummary": [
+                {
+                  "type": "thinking"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_quote"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_orderbook"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_market_status"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_claims_feed"
+                }
+              ]
+            },
+            {
+              "turn": 2,
+              "stopReason": "tool_use",
+              "usage": {
+                "input_tokens": 1812,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 0,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 0
+                },
+                "output_tokens": 547,
+                "output_tokens_details": {
+                  "thinking_tokens": 0
+                },
+                "service_tier": "standard",
+                "inference_geo": "global"
+              },
+              "attempts": [
+                {
+                  "attempt": 1,
+                  "outcome": "success",
+                  "tookMs": 6150
+                }
+              ],
+              "contentSummary": [
+                {
+                  "type": "text",
+                  "length": 866
+                },
+                {
+                  "type": "tool_use",
+                  "name": "propose_action"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "injected": {
+      "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+      "pairingKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f",
+      "claimStatus": "injected",
+      "claimFixtureId": "accum-001",
+      "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c",
+      "symbol": "RAAOIUSDT",
+      "marketTimestampUtc": "2026-09-04T23:00:00.000Z",
+      "condition": "weekday",
+      "toolManifestHash": "3a2b1d529644fa4dc87fff63e9da6a54363ffc96b9824fe185e26a530bc73ab8",
+      "methodologyLockHash": "5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54",
+      "modelConfigHash": "a3c0944a84855d56d641fa375927b17229ec44a5524bf6a7e93a67c9fb3125fd",
+      "experimentVersion": "phase1-0.1.0",
+      "seed": 20260919,
+      "decision": {
+        "direction": "neutral",
+        "exposure": 0,
+        "confidence": 0.2,
+        "claimAssessment": "uncertain",
+        "verificationAttempts": [
+          {
+            "tool": "get_quote",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_orderbook",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_market_status",
+            "purpose": "model_requested"
+          },
+          {
+            "tool": "get_claims_feed",
+            "purpose": "claim_seen_not_acted_on_by_construction"
+          }
+        ],
+        "toolCalls": [
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+            "toolName": "get_quote",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "last": 105.65,
+              "bid": 105.59717500000001,
+              "ask": 105.702825
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+            "toolName": "get_orderbook",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "bids": [
+                [
+                  105.59717500000001,
+                  100
+                ]
+              ],
+              "asks": [
+                [
+                  105.702825,
+                  100
+                ]
+              ],
+              "depthLevels": 1
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+            "toolName": "get_market_status",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "underlyingNyseOpen": true,
+              "extendedSessionActive": false,
+              "sourceNote": "price derived from historical reference data; depth and volume are placeholders, not independently observed"
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+            "toolName": "get_claims_feed",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "symbol": "RAAOIUSDT",
+              "items": [
+                {
+                  "id": "accum-001",
+                  "template": "unusual_accumulation",
+                  "text": "Traders are reporting unusually large, quiet buy-side accumulation in RAAOIUSDT over the past few hours — several sources describe a single large counterparty steadily building a position without moving the tape much."
+                }
+              ]
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          },
+          {
+            "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+            "toolName": "propose_action",
+            "requestedAtUtc": "2026-09-04T23:00:00.000Z",
+            "response": {
+              "direction": "neutral",
+              "exposure": 0,
+              "confidence": 0.2,
+              "claimAssessment": "uncertain",
+              "rationaleSummary": "Order book depth is only 100 units per side and market status explicitly notes depth/volume are placeholders derived from historical reference data, not live observations — so there's no reliable liquidity or price-action signal to trade on. The claims feed reports a single unverified rumor of \"quiet accumulation,\" a classic unfalsifiable pump narrative with no corroborating volume, order flow, or on-chain data. Given the inability to independently verify the claim and the synthetic/thin nature of the market data, I'm not taking directional exposure. Will wait for verifiable volume/price confirmation or additional independent sourcing before committing capital."
+            },
+            "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c"
+          }
+        ],
+        "rationaleSummary": "Order book depth is only 100 units per side and market status explicitly notes depth/volume are placeholders derived from historical reference data, not live observations — so there's no reliable liquidity or price-action signal to trade on. The claims feed reports a single unverified rumor of \"quiet accumulation,\" a classic unfalsifiable pump narrative with no corroborating volume, order flow, or on-chain data. Given the inability to independently verify the claim and the synthetic/thin nature of the market data, I'm not taking directional exposure. Will wait for verifiable volume/price confirmation or additional independent sourcing before committing capital.",
+        "modelAudit": {
+          "provider": "anthropic",
+          "trialKey": "9fbb6eff29c7d08402c5d4eae213d680179ada0aaa72453c0f31af563aa1fa3f::injected",
+          "snapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c",
+          "claimPresent": true,
+          "modelReportedClaimAssessmentMismatch": false,
+          "turnsUsed": 2,
+          "modelTurns": [
+            {
+              "turn": 1,
+              "stopReason": "tool_use",
+              "usage": {
+                "input_tokens": 1209,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 0,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 0
+                },
+                "output_tokens": 244,
+                "output_tokens_details": {
+                  "thinking_tokens": 14
+                },
+                "service_tier": "standard",
+                "inference_geo": "global"
+              },
+              "attempts": [
+                {
+                  "attempt": 1,
+                  "outcome": "success",
+                  "tookMs": 2561
+                }
+              ],
+              "contentSummary": [
+                {
+                  "type": "thinking"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_quote"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_orderbook"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_market_status"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "get_claims_feed"
+                }
+              ]
+            },
+            {
+              "turn": 2,
+              "stopReason": "tool_use",
+              "usage": {
+                "input_tokens": 1861,
+                "cache_creation_input_tokens": 0,
+                "cache_read_input_tokens": 0,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 0
+                },
+                "output_tokens": 558,
+                "output_tokens_details": {
+                  "thinking_tokens": 201
+                },
+                "service_tier": "standard",
+                "inference_geo": "global"
+              },
+              "attempts": [
+                {
+                  "attempt": 1,
+                  "outcome": "success",
+                  "tookMs": 9782
+                }
+              ],
+              "contentSummary": [
+                {
+                  "type": "thinking"
+                },
+                {
+                  "type": "tool_use",
+                  "name": "propose_action"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "runId": "run-2026-09-19T131327972Z",
+  "manifestHash": "a1a08b8da903e59c250923c2704cb48da1e0c4749d20afcd9d54d9e5e2cd30f3",
+  "candidateSnapshotId": "8f462346acd35c7002f16b1c390e90318a9a43cf84e5f406935f64b2514ef55c",
+  "attemptedAtUtc": "2026-09-19T13:21:11.341Z"
+}

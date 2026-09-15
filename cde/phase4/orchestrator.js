@@ -29,8 +29,18 @@ const { buildPairSafely } = require('../phase2/runRealModelExperiment');
 const { createRealModelAdapter } = require('../phase2/realModelAdapter');
 const { LOCKED_FIXTURES } = require('../lib/corpus');
 const { contentHash } = require('../lib/hash');
+const { toolManifestHash } = require('../lib/tools');
 const { redactSecrets, containsNoSecrets } = require('../phase2/secretRedaction');
 const { MIN_COMPLETED_PAIRS_PER_CONDITION, MAX_ATTEMPTED_PAIRS } = require('../analysis/lib/sampleSizeAssessment');
+// The SAME config-hash computation cde/phase2/runRealModelExperiment.js's
+// runOnePair() already uses for the smoke test — reused here, not
+// re-derived, so a research pair is stamped with Phase 2's REAL model
+// config identity rather than silently falling back to cde/phase1/trial.js's
+// buildPair() defaults (Phase 1's deterministic-adapter config). Missing
+// this was a real bug caught during Phase 4's first collection attempt —
+// see cde/runs/*-INVALID-* for the discarded run it produced.
+const { promptHash: computePromptHash } = require('../phase2/prompt');
+const { modelConfigHash: computeModelConfigHash, ADAPTER_VERSION } = require('../phase2/config');
 
 const RUNS_DIR = path.join(__dirname, '..', 'runs');
 
@@ -130,6 +140,18 @@ async function runResearchCollection(manifest, providerClient, opts = {}) {
   const adapter = createRealModelAdapter(providerClient);
   const allowedFixtureIds = LOCKED_FIXTURES.map((f) => f.id);
 
+  // Fixed once per run (does not depend on the candidate), matching
+  // ANALYSIS_PLAN.md §13's "single fixed provider/model/config per
+  // analysis version" — every pair in this run is stamped with the same
+  // real Phase 2 configuration identity.
+  const pairBuildOptions = {
+    adapter,
+    modelConfigHash: computeModelConfigHash({ toolManifestHash: toolManifestHash() }),
+    promptHash: computePromptHash(),
+    experimentVersion: ADAPTER_VERSION,
+    seed: 0, // matches cde/phase2/runRealModelExperiment.js: runOnePair() — no provider-level seed control exists (see cde/phase2/README.md)
+  };
+
   const done = alreadyAttemptedSnapshotIds(trialsDir, failuresDir);
   let counts = countCompletedByCondition(trialsDir);
   let attempted = countAttempted(trialsDir, failuresDir);
@@ -151,7 +173,7 @@ async function runResearchCollection(manifest, providerClient, opts = {}) {
     const claimFixture = LOCKED_FIXTURES[fixtureCycle % LOCKED_FIXTURES.length];
     fixtureCycle += 1;
 
-    const outcome = await buildPairSafely(candidate.snapshot, claimFixture, allowedFixtureIds, { adapter });
+    const outcome = await buildPairSafely(candidate.snapshot, claimFixture, allowedFixtureIds, pairBuildOptions);
     const stamped = { ...outcome, runId: manifest.runId, manifestHash: manifest.manifestHash, candidateSnapshotId: candidate.snapshot.snapshotId, attemptedAtUtc: new Date().toISOString() };
     writeArtifactIfAbsent({ trialsDir, failuresDir }, candidate.snapshot.snapshotId, stamped);
     done.add(candidate.snapshot.snapshotId);

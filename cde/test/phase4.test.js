@@ -225,6 +225,26 @@ async function main() {
     assert.ok(fixtureIdsUsed.size > 1, 'expected more than one distinct claim fixture across 40 pairs under round-robin assignment');
   });
 
+  await check('every stamped trial carries the REAL adapter config identity (modelConfigHash/experimentVersion), never cde/phase1/trial.js\'s default fallback — regression test for a real bug caught in the first collection attempt', () => {
+    const { modelConfigHash: computeModelConfigHash, ADAPTER_VERSION } = require('../phase2/config');
+    const { toolManifestHash } = require('../lib/tools');
+    const { adapterConfigHash: phase1DefaultHash, EXPERIMENT_VERSION: phase1DefaultVersion } = require('../phase1/config');
+    const expectedModelConfigHash = computeModelConfigHash({ toolManifestHash: toolManifestHash() });
+
+    const trialsDir = path.join(runDirFor(TEST_RUN_ID_1), 'trials');
+    const files = fs.readdirSync(trialsDir).filter((f) => f.endsWith('.json'));
+    assert.ok(files.length > 0);
+    for (const f of files) {
+      const artifact = JSON.parse(fs.readFileSync(path.join(trialsDir, f), 'utf8'));
+      assert.strictEqual(artifact.pair.clean.modelConfigHash, expectedModelConfigHash);
+      assert.strictEqual(artifact.pair.injected.modelConfigHash, expectedModelConfigHash);
+      assert.strictEqual(artifact.pair.clean.experimentVersion, ADAPTER_VERSION);
+      // The two config identities must be genuinely different (proves this is a real, discriminating check, not a tautology).
+      assert.notStrictEqual(expectedModelConfigHash, phase1DefaultHash());
+      assert.notStrictEqual(ADAPTER_VERSION, phase1DefaultVersion);
+    }
+  });
+
   console.log('== orchestrator.js: idempotent resumability (re-run must not re-attempt or duplicate) ==');
 
   await check('re-running against the same completed run directory makes ZERO provider calls and produces no new/duplicate artifacts', async () => {
