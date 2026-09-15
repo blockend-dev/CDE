@@ -347,6 +347,65 @@ async function main() {
     assert.strictEqual(stoppingConditionMet({ weekday: 10, weekend: 5 }, 50).stop, false);
   });
 
+  console.log('== datasetFinalize.js ==');
+
+  const { finalizeDataset } = require('../phase4/datasetFinalize');
+  const TEST_RUN_ID_3 = 'test-dataset-finalize';
+  cleanupTestRun(TEST_RUN_ID_3);
+
+  await check('finalizeDataset() reports a clean collection accurately: zero duplicates, zero violations, consistent config, consumable by Phase 3', async () => {
+    const manifest = buildRunManifest({ startedAtUtc: '2026-01-01T00:00:00.000Z' });
+    manifest.runId = TEST_RUN_ID_3;
+    await runResearchCollection(manifest, new ScriptedFakeProviderClient(happyPathScript()));
+
+    const dataset = finalizeDataset(runDirFor(TEST_RUN_ID_3));
+    assert.strictEqual(dataset.completedPairsCount, MIN_COMPLETED_PAIRS_PER_CONDITION * 2);
+    assert.strictEqual(dataset.completedByCondition.weekday, MIN_COMPLETED_PAIRS_PER_CONDITION);
+    assert.strictEqual(dataset.completedByCondition.weekend, MIN_COMPLETED_PAIRS_PER_CONDITION);
+    assert.strictEqual(dataset.duplicateTrialKeyCount, 0);
+    assert.strictEqual(dataset.duplicatePairingKeyCount, 0);
+    assert.strictEqual(dataset.integrityViolationCount, 0);
+    assert.strictEqual(dataset.configConsistent, true);
+    assert.strictEqual(dataset.consumableByPhase3Pipeline, true);
+    assert.strictEqual(dataset.phase3ClassificationSummary.completedWeekday, MIN_COMPLETED_PAIRS_PER_CONDITION);
+    assert.ok(fs.existsSync(path.join(runDirFor(TEST_RUN_ID_3), 'dataset_manifest.json')));
+  });
+
+  await check('finalizeDataset() is content-addressed and deterministic given the same run directory', () => {
+    const a = finalizeDataset(runDirFor(TEST_RUN_ID_3));
+    const b = finalizeDataset(runDirFor(TEST_RUN_ID_3));
+    assert.strictEqual(a.datasetManifestHash, b.datasetManifestHash);
+  });
+
+  await check('finalizeDataset() genuinely DETECTS a duplicate trialKey and a config inconsistency, rather than always reporting clean', () => {
+    const trialsDir = path.join(runDirFor(TEST_RUN_ID_3), 'trials');
+    const files = fs.readdirSync(trialsDir).filter((f) => f.endsWith('.json'));
+    const victim = JSON.parse(fs.readFileSync(path.join(trialsDir, files[0]), 'utf8'));
+
+    // Duplicate trialKey: clone one artifact's trialKeys onto another's snapshotId-named file.
+    const corrupted = JSON.parse(JSON.stringify(victim));
+    corrupted.candidateSnapshotId = 'corrupted-duplicate-test';
+    fs.writeFileSync(path.join(trialsDir, 'corrupted-duplicate-test.json'), JSON.stringify(corrupted, null, 2));
+
+    // Config inconsistency: a second corrupted artifact with a tampered modelConfigHash.
+    const tampered = JSON.parse(JSON.stringify(victim));
+    tampered.candidateSnapshotId = 'corrupted-config-test';
+    tampered.pair.clean.modelConfigHash = 'tampered-hash';
+    fs.writeFileSync(path.join(trialsDir, 'corrupted-config-test.json'), JSON.stringify(tampered, null, 2));
+
+    const dataset = finalizeDataset(runDirFor(TEST_RUN_ID_3));
+    assert.ok(dataset.duplicateTrialKeyCount > 0, 'must detect the duplicated trialKey');
+    assert.ok(dataset.duplicatePairingKeyCount > 0, 'must detect the duplicated pairingKey');
+    assert.strictEqual(dataset.configConsistent, false, 'must detect the tampered modelConfigHash');
+    assert.strictEqual(dataset.configConsistency.modelConfigHash.consistent, false);
+
+    // Clean up the injected corruption so it never contaminates a real run.
+    fs.unlinkSync(path.join(trialsDir, 'corrupted-duplicate-test.json'));
+    fs.unlinkSync(path.join(trialsDir, 'corrupted-config-test.json'));
+  });
+
+  cleanupTestRun(TEST_RUN_ID_3);
+
   console.log(`\n${failures === 0 ? 'ALL PHASE 4 TESTS PASSED' : `${failures} TEST(S) FAILED`}`);
   process.exit(failures === 0 ? 0 : 1);
 }
