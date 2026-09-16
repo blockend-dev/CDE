@@ -10,6 +10,7 @@
     "test:phase2": "node cde/test/phase2.test.js",
     "test:phase3": "node cde/test/phase3.test.js",
     "test:phase4": "node cde/test/phase4.test.js",
+    "test:phase5": "node cde/test/phase5.test.js",
     "test:precondition": "node research/weekend-informativeness/selfTest.js"
   },
   "engines": {
