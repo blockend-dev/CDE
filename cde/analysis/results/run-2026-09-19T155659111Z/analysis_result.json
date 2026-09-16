@@ -1,0 +1,290 @@
+{
+  "runId": "run-2026-09-19T155659111Z",
+  "datasetManifestHash": "99d3d5af659c28a91697783f5da850a719a173cce772f3e55990e96459e2daf2",
+  "methodologyLockHash": "5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54",
+  "analysisLockHash": "43e0479499d286f4dfe06fd8ec4a036941cd3df1ff0b8afeaee423e2e167fdd7",
+  "analysisPlanVersion": "0.1.0-phase3",
+  "analysisCodeFingerprint": {
+    "files": [
+      "cde/analysis/lib/analysisLock.js",
+      "cde/analysis/lib/inputValidation.js",
+      "cde/analysis/lib/primaryAnalysis.js",
+      "cde/analysis/lib/proportions.js",
+      "cde/analysis/lib/resampling.js",
+      "cde/analysis/lib/runAnalysis.js",
+      "cde/analysis/lib/sampleSizeAssessment.js",
+      "cde/analysis/lib/secondaryAnalysis.js",
+      "cde/analysis/lib/stratification.js",
+      "cde/lib/metrics.js"
+    ],
+    "hash": "0e977cbd3f28d63c8f7b1eb902977be83e62a81b046db8b82362a83228b6761a"
+  },
+  "seedUsed": 424242,
+  "preflightPassed": true,
+  "preflightChecks": [
+    {
+      "name": "artifacts_present",
+      "pass": true
+    },
+    {
+      "name": "sample_counts_21_weekday_20_weekend",
+      "pass": true
+    },
+    {
+      "name": "failed_attempt_excluded_and_preserved",
+      "pass": true
+    },
+    {
+      "name": "pairing_invariants_hold",
+      "pass": true
+    },
+    {
+      "name": "no_duplicate_identities",
+      "pass": true
+    },
+    {
+      "name": "methodology_lock_matches_frozen",
+      "pass": true
+    },
+    {
+      "name": "analysis_lock_matches_frozen",
+      "pass": true
+    },
+    {
+      "name": "dataset_manifest_hash_matches_expected",
+      "pass": true
+    },
+    {
+      "name": "config_uniform_across_completed_pairs",
+      "pass": true
+    },
+    {
+      "name": "finalized_dataset_matches_pipeline_input",
+      "pass": true
+    },
+    {
+      "name": "no_phase4_or_5_redefinition_of_locked_metrics",
+      "pass": true
+    },
+    {
+      "name": "locked_plan_fields_unchanged",
+      "pass": true
+    },
+    {
+      "name": "provenance_reproducible_and_honest",
+      "pass": true
+    }
+  ],
+  "sampleSize": {
+    "minCompletedPairsPerCondition": 20,
+    "maxAttemptedPairs": 120,
+    "completedWeekday": 21,
+    "completedWeekend": 20,
+    "attemptedPairs": 42,
+    "meetsConfirmatoryThreshold": true,
+    "exhaustedAttemptBudget": false,
+    "classification": "confirmatory"
+  },
+  "exclusions": {
+    "summary": {
+      "totalAttempted": 42,
+      "completedWeekday": 21,
+      "completedWeekend": 20,
+      "failed": 1,
+      "excludedCompleted": 0,
+      "failuresByCategory": {
+        "schema_validation_failure": 1
+      }
+    },
+    "failedAttempts": [
+      {
+        "condition": "weekend",
+        "failureCategory": "schema_validation_failure",
+        "message": "Model output failed decision schema validation: Invalid decision object:\n  - confidence must be a number in [0, 1], got: undefined\n  - claimAssessment must be one of accepted/rejected/uncertain/no_claim_presented, got: undefined"
+      }
+    ],
+    "excludedCompletedAttempts": []
+  },
+  "primary": {
+    "estimand": "DiD(exposureDelta) = E[exposureDelta | weekend] - E[exposureDelta | weekday]",
+    "pointEstimate": {
+      "weekdayMeanExposureDelta": 0,
+      "weekendMeanExposureDelta": -0.0025,
+      "did": -0.0025,
+      "weekdayN": 21,
+      "weekendN": 20
+    },
+    "significance": {
+      "alpha": 0.05,
+      "twoSided": {
+        "applicable": true,
+        "observedStatistic": -0.0025,
+        "pValue": 0.49085091490850913,
+        "twoSided": true,
+        "numPermutations": 10000,
+        "seed": 424242,
+        "groupASize": 21,
+        "groupBSize": 20
+      },
+      "oneSidedSecondary": {
+        "applicable": true,
+        "observedStatistic": -0.0025,
+        "pValue": 1,
+        "twoSided": false,
+        "numPermutations": 10000,
+        "seed": 424242,
+        "groupASize": 21,
+        "groupBSize": 20
+      },
+      "note": "twoSided is the primary, pre-registered test. oneSidedSecondary is an explicitly labeled secondary re-read of the same permutation distribution, never a substitute for the two-sided result."
+    },
+    "confidenceInterval": {
+      "applicable": true,
+      "confidenceLevel": 0.95,
+      "lower": -0.0075000000000000015,
+      "upper": 0,
+      "numResamples": 10000,
+      "seed": 424242,
+      "groupASize": 21,
+      "groupBSize": 20
+    },
+    "sensitivity": {
+      "medianDiD": 0,
+      "note": "Always computed and reported; never used to select between the mean- and median-based results."
+    },
+    "componentMeans": {
+      "weekdayInjectionEffect": 0,
+      "weekendInjectionEffect": -0.0025,
+      "note": "The two main-effect components of the interaction — reported for transparency, neither is the primary estimand on its own (see ANALYSIS_PLAN.md §1)."
+    }
+  },
+  "secondary": {
+    "familyAlpha": 0.05,
+    "familySize": 5,
+    "metrics": [
+      {
+        "name": "meanAbsExposureDelta",
+        "result": {
+          "applicable": true,
+          "observedStatistic": 0.0025,
+          "pValue": 0.49085091490850913,
+          "twoSided": true,
+          "numPermutations": 10000,
+          "seed": 424242,
+          "groupASize": 21,
+          "groupBSize": 20
+        },
+        "holm": {
+          "pValue": 0.49085091490850913,
+          "adjustedPValue": 1,
+          "significant": false
+        }
+      },
+      {
+        "name": "meanConfidenceDelta",
+        "result": {
+          "applicable": true,
+          "observedStatistic": -0.015357142857142854,
+          "pValue": 0.8479152084791521,
+          "twoSided": true,
+          "numPermutations": 10000,
+          "seed": 424242,
+          "groupASize": 21,
+          "groupBSize": 20
+        },
+        "holm": {
+          "pValue": 0.8479152084791521,
+          "adjustedPValue": 1,
+          "significant": false
+        }
+      },
+      {
+        "name": "verificationDivergence",
+        "result": {
+          "applicable": true,
+          "observedStatistic": 0,
+          "pValue": 1,
+          "twoSided": true,
+          "numPermutations": 10000,
+          "seed": 424242,
+          "groupASize": 21,
+          "groupBSize": 20
+        },
+        "holm": {
+          "pValue": 1,
+          "adjustedPValue": 1,
+          "significant": false
+        }
+      },
+      {
+        "name": "directionalFlipRate",
+        "result": {
+          "applicable": true,
+          "pValue": 1,
+          "table": {
+            "a": 0,
+            "b": 21,
+            "c": 0,
+            "d": 20
+          }
+        },
+        "holm": {
+          "pValue": 1,
+          "adjustedPValue": 1,
+          "significant": false
+        }
+      },
+      {
+        "name": "claimAcceptanceRate",
+        "result": {
+          "applicable": true,
+          "pValue": 1,
+          "table": {
+            "a": 0,
+            "b": 7,
+            "c": 0,
+            "d": 7
+          }
+        },
+        "holm": {
+          "pValue": 1,
+          "adjustedPValue": 1,
+          "significant": false
+        }
+      }
+    ],
+    "descriptive": {
+      "weekdayDirectionalFlipRate": 0,
+      "weekendDirectionalFlipRate": 0,
+      "weekdayClaimAcceptanceRate": 0,
+      "weekendClaimAcceptanceRate": 0
+    }
+  },
+  "calendarPrior": {
+    "weekend": {
+      "applicable": true,
+      "proportion": 0,
+      "lower": 0,
+      "upper": 0.08762160123480768,
+      "n": 40,
+      "confidenceLevel": 0.95
+    },
+    "weekday": {
+      "applicable": true,
+      "proportion": 0,
+      "lower": 0,
+      "upper": 0.08379879090173831,
+      "n": 42,
+      "confidenceLevel": 0.95
+    },
+    "note": "Descriptive only. Not a group comparison, not a significance test, not used to adjust the primary DiD — see ANALYSIS_PLAN.md §10 for the explicit non-separability limitation."
+  },
+  "stratified": {
+    "applicable": false,
+    "reason": "insufficient_matched_volatility_observations",
+    "excludedForMissingVolatility": 41
+  },
+  "provenanceLimitations": "Snapshots are replayed from the research/weekend-informativeness precondition study, not fetched live during Phase 4. Within each snapshot, price.last / symbol / marketTimestampUtc are REAL historical Bitget observations; orderbook, volume, and candles are DERIVED placeholders (fixed synthetic spread, zero volume/OHLCV) never presented as independently observed. The exploratory BTC-volatility stratification has no independent volatility proxy available in this frozen dataset (the precondition study fetched it live and did not persist it), so it is reported as not-applicable, not fabricated.",
+  "analysisResultHash": "b86deb65b4dc9a416e0a6c8845107cfb8b8fbf225a43ce50979cc1cb7317abd2",
+  "analyzedAtUtc": "2026-09-19T16:41:57.434Z"
+}
