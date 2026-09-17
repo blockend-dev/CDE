@@ -1,8 +1,10 @@
 import { el } from './api.js';
 import { renderLab } from './screens/lab.js';
+import { renderCounterfactual } from './screens/counterfactual.js';
 
 const NAV = [
   { idx: '01', hash: '#/lab', label: 'The Lab', render: renderLab },
+  { idx: '02', hash: '#/counterfactual', label: 'Counterfactual Lab', render: renderCounterfactual },
 ];
 
 const app = document.getElementById('app');

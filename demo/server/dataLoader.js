@@ -52,7 +52,12 @@ function buildPairRecord(trial) {
   const delta = injectedDelta(clean.decision, injected.decision);
   const verifDiv = verificationDivergence(clean.decision, injected.decision);
   const claimStatusChanged = clean.decision.claimAssessment !== injected.decision.claimAssessment;
-  const structuredDecisionChanged = delta.exposureDelta !== 0 || delta.directionFlip || delta.confidenceDelta !== 0 || claimStatusChanged;
+  // Deliberately matches cde/lib/metrics.js: injectedDelta()'s own three fields exactly — NOT
+  // claimStatusChanged, which is expected/definitional (clean trials are claim-blind by
+  // construction, so their claimAssessment is always "no_claim_presented"; it differs from the
+  // injected member's assessment on every pair in this dataset and is therefore not a meaningful
+  // "did the decision change" signal on its own).
+  const structuredDecisionChanged = delta.exposureDelta !== 0 || delta.directionFlip || delta.confidenceDelta !== 0;
   const claim = claimTextFor(injected.claimFixtureId, injected.symbol);
 
   return {
