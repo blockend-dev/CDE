@@ -161,4 +161,4 @@ function experimentSummary() {
   };
 }
 
-module.exports = { RUN_ID, RUN_DIR, load, getPair, listPairs, experimentSummary };
+module.exports = { RUN_ID, RUN_DIR, ANALYSIS_RESULT_PATH, load, getPair, listPairs, experimentSummary };

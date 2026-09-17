@@ -1,0 +1,95 @@
+'use strict';
+/**
+ * Integrity Console backend — reuses the already-tested Phase 5 preflight
+ * engine (cde/phase5/preflight.js) and the Phase 5 analysis runner
+ * verbatim. This module adds NO new validation logic of its own beyond
+ * labeling and a live reproducibility re-run; every actual check is the
+ * same code cde/test/phase4.test.js / phase5.test.js already exercise.
+ */
+
+const fs = require('fs');
+
+const { runPreflight } = require('../../cde/phase5/preflight');
+const { runResearchAnalysis } = require('../../cde/phase5/runResearchAnalysis');
+const dataLoader = require('./dataLoader');
+
+const EXPECTED = {
+  methodologyLockHash: '5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54',
+  analysisLockHash: '43e0479499d286f4dfe06fd8ec4a036941cd3df1ff0b8afeaee423e2e167fdd7',
+  datasetManifestHash: '99d3d5af659c28a91697783f5da850a719a173cce772f3e55990e96459e2daf2',
+};
+
+const LABELS = {
+  artifacts_present: 'run artifacts present',
+  sample_counts_21_weekday_20_weekend: 'sample counts (21 weekday / 20 weekend)',
+  failed_attempt_excluded_and_preserved: 'failed attempt excluded & preserved',
+  pairing_invariants_hold: 'pair invariants',
+  no_duplicate_identities: 'no duplicate trial/pair/snapshot identities',
+  methodology_lock_matches_frozen: 'methodology lock',
+  analysis_lock_matches_frozen: 'analysis lock',
+  dataset_manifest_hash_matches_expected: 'dataset integrity',
+  config_uniform_across_completed_pairs: 'configuration consistency',
+  finalized_dataset_matches_pipeline_input: 'dataset matches analysis pipeline input',
+  no_phase4_or_5_redefinition_of_locked_metrics: 'no post-hoc redefinition of locked metrics',
+  locked_plan_fields_unchanged: 'locked analysis plan fields unchanged',
+  provenance_reproducible_and_honest: 'provenance',
+};
+
+/**
+ * Runs the real preflight engine plus a live reproducibility check
+ * (re-executes the locked analysis right now and compares its hash to the
+ * committed analysis artifact). Never mutates cde/runs/ — preflight is
+ * read-only, and re-running the analysis writes only to
+ * cde/analysis/results/, which is idempotent/content-addressed.
+ */
+function verifyExperiment() {
+  const preflight = runPreflight(dataLoader.RUN_DIR, EXPECTED);
+  const checks = preflight.checks.map((c) => ({
+    name: c.name,
+    label: LABELS[c.name] || c.name,
+    pass: c.pass,
+    detail: summarize(c.name, c.detail),
+  }));
+
+  let reproducibility;
+  try {
+    const committed = JSON.parse(fs.readFileSync(dataLoader.ANALYSIS_RESULT_PATH, 'utf8'));
+    const fresh = runResearchAnalysis(dataLoader.RUN_DIR, EXPECTED);
+    reproducibility = {
+      name: 'reproducibility',
+      label: 'reproducibility (re-run now vs. committed result)',
+      pass: fresh.analysisResultHash === committed.analysisResultHash,
+      detail: { committedHash: committed.analysisResultHash, freshHash: fresh.analysisResultHash },
+    };
+  } catch (err) {
+    reproducibility = { name: 'reproducibility', label: 'reproducibility (re-run now vs. committed result)', pass: false, detail: { error: err.message } };
+  }
+  checks.push(reproducibility);
+
+  return { allPassed: checks.every((c) => c.pass), checks };
+}
+
+function summarize(name, detail) {
+  if (name === 'sample_counts_21_weekday_20_weekend') return { completedWeekday: detail.completedWeekday, completedWeekend: detail.completedWeekend };
+  if (name === 'no_duplicate_identities') return { uniqueTrialKeys: detail.uniqueTrialKeys, uniquePairingKeys: detail.uniquePairingKeys, uniqueSnapshotIds: detail.uniqueSnapshotIds };
+  if (name === 'provenance_reproducible_and_honest') return { checkedTrials: detail.checkedTrials, issues: detail.issues.length };
+  if (name === 'pairing_invariants_hold') return { violations: Array.isArray(detail) ? detail.length : 0 };
+  return undefined;
+}
+
+/** The experiment's cryptographic identity — displayed as VERIFIED badges with truncatable full hashes. */
+function experimentIdentity() {
+  const d = dataLoader.load();
+  return [
+    { label: 'Methodology lock', hash: d.methodologyLock.contentHash },
+    { label: 'Analysis lock', hash: d.analysisLock.contentHash },
+    { label: 'Dataset manifest', hash: d.datasetManifest.datasetManifestHash },
+    { label: 'Model configuration', hash: d.runManifest.modelConfigHash },
+    { label: 'Prompt', hash: d.runManifest.promptHash },
+    { label: 'Tool manifest', hash: d.runManifest.toolManifestHash },
+    { label: 'Attack corpus', hash: d.runManifest.attackCorpusHash },
+    { label: 'Run manifest', hash: d.runManifest.manifestHash },
+  ];
+}
+
+module.exports = { verifyExperiment, experimentIdentity, EXPECTED };

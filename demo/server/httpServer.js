@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 const dataLoader = require('./dataLoader');
+const integrity = require('./integrity');
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 const PORT = Number(process.env.DEMO_PORT || 5175);
@@ -92,6 +93,17 @@ route('GET', '/api/pairs/:pairingKey', (req, res, params) => {
   const pair = dataLoader.getPair(params.pairingKey);
   if (!pair) return sendError(res, 404, 'pair not found');
   sendJson(res, 200, pair);
+});
+
+route('GET', '/api/integrity/identity', (req, res) => {
+  sendJson(res, 200, { identity: integrity.experimentIdentity() });
+});
+
+route('POST', '/api/integrity/verify', (req, res) => {
+  // Synchronous by design: this actually re-executes the locked analysis
+  // and every preflight check (~seconds), it does not simulate a delay.
+  const result = integrity.verifyExperiment();
+  sendJson(res, 200, result);
 });
 
 function handle(req, res) {
