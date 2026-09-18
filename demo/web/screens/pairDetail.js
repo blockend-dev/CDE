@@ -3,13 +3,15 @@ import { renderCounterfactualTab } from './tabs/counterfactualTab.js';
 import { renderChainTab } from './tabs/chainTab.js';
 import { renderXrayTab } from './tabs/xrayTab.js';
 import { renderProvenanceTab } from './tabs/provenanceTab.js';
-import { renderPicker } from './casefiles.js';
+import { renderBaselineTab } from './tabs/baselineTab.js';
+import { renderCaseFiles } from './casefiles.js';
 
 const TABS = [
   { key: 'counterfactual', label: 'Counterfactual', render: renderCounterfactualTab },
   { key: 'chain', label: 'Truth → Belief → Action', render: renderChainTab },
   { key: 'xray', label: 'Evidence X-Ray', render: renderXrayTab },
   { key: 'provenance', label: 'Provenance', render: renderProvenanceTab },
+  { key: 'baseline', label: 'Baseline Control', render: renderBaselineTab },
 ];
 
 export async function renderPairDetail(main, rest) {
@@ -17,7 +19,7 @@ export async function renderPairDetail(main, rest) {
   const pairingKey = parts[0];
   const tabKey = parts[1] || 'counterfactual';
 
-  if (!pairingKey) return renderPicker(main, (key) => (location.hash = `#/pair/${key}/counterfactual`));
+  if (!pairingKey) return renderCaseFiles(main);
 
   main.appendChild(el('div', { class: 'loading' }, 'Loading pair…'));
   let pair;

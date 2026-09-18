@@ -1,33 +1,69 @@
 import { api, el, fmtNum } from '../api.js';
 
-/** Minimal picker used by pairDetail.js until the full filterable gallery lands. */
-export async function renderPicker(main, onSelect) {
-  main.appendChild(el('div', { class: 'eyebrow' }, 'Replay Case Files'));
-  main.appendChild(el('h1', {}, 'Select a completed pair to replay'));
-  main.appendChild(el('p', { class: 'lede' }, 'Every pair below shares one frozen market snapshot. Only the presence of an injected claim differs between its two trials.'));
-  main.appendChild(el('div', { class: 'loading' }, 'Loading pairs…'));
-  const { pairs } = await api('/pairs');
-  main.querySelector('.loading').remove();
+const FILTER_DEFS = [
+  { key: 'condition', label: 'Condition', options: ['', 'weekday', 'weekend'] },
+  { key: 'claimTemplate', label: 'Claim Category', options: ['', 'unusual_accumulation', 'unusual_distribution', 'unscheduled_analyst_action'] },
+  { key: 'direction', label: 'Injected Direction', options: ['', 'long', 'short', 'neutral'] },
+  { key: 'changed', label: 'Structured Change', options: ['', 'true', 'false'], labels: { true: 'changed', false: 'no change' } },
+  { key: 'claimAssessment', label: 'Claim Assessment', options: ['', 'accepted', 'rejected', 'uncertain'] },
+];
 
-  const list = el('div', { class: 'grid grid-3' });
-  for (const p of pairs) {
-    list.appendChild(
-      el(
-        'div',
-        { class: 'case-card', onclick: () => onSelect(p.pairingKey) },
-        [
-          el('div', { class: 'case-card-top' }, [
-            el('span', { class: 'case-card-id mono' }, p.symbol),
-            el('span', { class: `badge ${p.condition === 'weekend' ? 'derived' : 'real'}` }, p.condition.toUpperCase()),
-          ]),
-          el('div', { class: 'mono', style: 'font-size:11px;color:var(--text-faint);margin-bottom:8px;' }, p.claimTemplate ? p.claimTemplate.replace(/_/g, ' ') : ''),
-          el('div', { class: 'mono', style: 'font-size:12px;' }, [
-            el('span', { style: `color:${p.structuredDecisionChanged ? 'var(--claim)' : 'var(--text-faint)'}` }, p.structuredDecisionChanged ? 'CHANGED' : 'NO CHANGE'),
-            `  Δexposure ${fmtNum(p.exposureDelta)}`,
-          ]),
-        ]
-      )
+export async function renderCaseFiles(main) {
+  main.appendChild(el('div', { class: 'eyebrow' }, 'Replay Case Files'));
+  main.appendChild(el('h1', {}, 'All 41 Completed Pairs'));
+  main.appendChild(el('p', { class: 'lede' }, 'Every card is a forensic case file: one frozen snapshot, replayed clean and injected. Filter by regime, attack category, or outcome — this is the full confirmatory dataset, nothing exploratory is mixed in.'));
+
+  const filterBar = el('div', { class: 'panel', style: 'display:flex; gap:14px; flex-wrap:wrap; margin:16px 0;' });
+  const state = {};
+  for (const f of FILTER_DEFS) {
+    const select = el(
+      'select',
+      {
+        style: 'background:var(--bg-raised); color:var(--text); border:1px solid var(--border); border-radius:3px; padding:6px 8px; font-family:var(--mono); font-size:11.5px;',
+        onchange: (e) => {
+          state[f.key] = e.target.value;
+          refresh();
+        },
+      },
+      f.options.map((o) => el('option', { value: o }, o === '' ? `${f.label}: any` : f.labels && f.labels[o] ? f.labels[o] : o))
     );
+    filterBar.appendChild(el('div', {}, [el('div', { class: 'stat-label' }, f.label), select]));
   }
-  main.appendChild(list);
+  main.appendChild(filterBar);
+
+  const countLine = el('div', { class: 'mono', style: 'font-size:11px; color:var(--text-faint); margin-bottom:10px;' });
+  main.appendChild(countLine);
+  const grid = el('div', { class: 'grid grid-3' });
+  main.appendChild(grid);
+
+  async function refresh() {
+    grid.innerHTML = '';
+    countLine.textContent = 'Loading…';
+    const query = Object.fromEntries(Object.entries(state).filter(([, v]) => v));
+    const qs = new URLSearchParams(query).toString();
+    const { count, pairs } = await api(`/pairs${qs ? `?${qs}` : ''}`);
+    countLine.textContent = `${count} of 41 pairs match`;
+    for (const p of pairs) grid.appendChild(card(p));
+  }
+
+  await refresh();
+}
+
+function card(p) {
+  return el(
+    'div',
+    { class: 'case-card', onclick: () => (location.hash = `#/pair/${p.pairingKey}/counterfactual`) },
+    [
+      el('div', { class: 'case-card-top' }, [
+        el('span', { class: 'case-card-id mono' }, p.symbol),
+        el('span', { class: `badge ${p.condition === 'weekend' ? 'derived' : 'real'}` }, p.condition.toUpperCase()),
+      ]),
+      el('div', { class: 'mono', style: 'font-size:11px;color:var(--text-faint);margin-bottom:8px;' }, p.claimTemplate ? p.claimTemplate.replace(/_/g, ' ') : ''),
+      el('div', { class: 'mono', style: 'font-size:12px; display:flex; justify-content:space-between;' }, [
+        el('span', { style: `color:${p.structuredDecisionChanged ? 'var(--claim)' : 'var(--text-faint)'}` }, p.structuredDecisionChanged ? 'CHANGED' : 'NO CHANGE'),
+        el('span', {}, `Δexp ${fmtNum(p.exposureDelta)}`),
+      ]),
+      el('div', { class: 'mono', style: 'font-size:11px; color:var(--text-faint); margin-top:6px;' }, `${p.injectedDirection} · ${p.injectedClaimAssessment}`),
+    ]
+  );
 }
