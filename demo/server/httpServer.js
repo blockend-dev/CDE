@@ -15,6 +15,8 @@ const path = require('path');
 const dataLoader = require('./dataLoader');
 const integrity = require('./integrity');
 const tamper = require('./tamper');
+const provenance = require('./provenance');
+const baseline = require('./baseline');
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 const PORT = Number(process.env.DEMO_PORT || 5175);
@@ -94,6 +96,22 @@ route('GET', '/api/pairs/:pairingKey', (req, res, params) => {
   const pair = dataLoader.getPair(params.pairingKey);
   if (!pair) return sendError(res, 404, 'pair not found');
   sendJson(res, 200, pair);
+});
+
+route('GET', '/api/pairs/:pairingKey/provenance', (req, res, params) => {
+  try {
+    sendJson(res, 200, provenance.provenanceFor(params.pairingKey));
+  } catch (err) {
+    sendError(res, 404, err.message);
+  }
+});
+
+route('GET', '/api/pairs/:pairingKey/baseline', (req, res, params) => {
+  try {
+    sendJson(res, 200, baseline.baselineFor(params.pairingKey));
+  } catch (err) {
+    sendError(res, 404, err.message);
+  }
 });
 
 route('GET', '/api/integrity/identity', (req, res) => {

@@ -2,12 +2,14 @@ import { api, el, shortHash } from '../api.js';
 import { renderCounterfactualTab } from './tabs/counterfactualTab.js';
 import { renderChainTab } from './tabs/chainTab.js';
 import { renderXrayTab } from './tabs/xrayTab.js';
+import { renderProvenanceTab } from './tabs/provenanceTab.js';
 import { renderPicker } from './casefiles.js';
 
 const TABS = [
   { key: 'counterfactual', label: 'Counterfactual', render: renderCounterfactualTab },
   { key: 'chain', label: 'Truth → Belief → Action', render: renderChainTab },
   { key: 'xray', label: 'Evidence X-Ray', render: renderXrayTab },
+  { key: 'provenance', label: 'Provenance', render: renderProvenanceTab },
 ];
 
 export async function renderPairDetail(main, rest) {
