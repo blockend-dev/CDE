@@ -2,11 +2,13 @@ import { el } from './api.js';
 import { renderLab } from './screens/lab.js';
 import { renderPairDetail } from './screens/pairDetail.js';
 import { renderIntegrity } from './screens/integrity.js';
+import { renderBreak } from './screens/break.js';
 
 const NAV = [
   { idx: '01', hash: '#/lab', label: 'The Lab', render: renderLab },
   { idx: '02', hash: '#/pair', label: 'Counterfactual Lab', render: renderPairDetail },
   { idx: '03', hash: '#/integrity', label: 'Integrity Console', render: renderIntegrity },
+  { idx: '04', hash: '#/break', label: 'Break The Experiment', render: renderBreak },
 ];
 
 const app = document.getElementById('app');

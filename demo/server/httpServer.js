@@ -14,6 +14,7 @@ const path = require('path');
 
 const dataLoader = require('./dataLoader');
 const integrity = require('./integrity');
+const tamper = require('./tamper');
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 const PORT = Number(process.env.DEMO_PORT || 5175);
@@ -104,6 +105,19 @@ route('POST', '/api/integrity/verify', (req, res) => {
   // and every preflight check (~seconds), it does not simulate a delay.
   const result = integrity.verifyExperiment();
   sendJson(res, 200, result);
+});
+
+route('GET', '/api/tamper/scenarios', (req, res) => {
+  sendJson(res, 200, { scenarios: tamper.listScenarios() });
+});
+
+route('POST', '/api/tamper/:scenario', (req, res, params) => {
+  try {
+    const result = tamper.runTamperScenario(params.scenario);
+    sendJson(res, 200, result);
+  } catch (err) {
+    sendError(res, 400, err.message);
+  }
 });
 
 function handle(req, res) {
