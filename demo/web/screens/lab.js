@@ -1,4 +1,5 @@
 import { api, el, fmtNum } from '../api.js';
+import { startJudgeMode } from '../judgeMode.js';
 
 export async function renderLab(main) {
   main.appendChild(el('div', { class: 'loading' }, 'Loading frozen experiment…'));
@@ -9,6 +10,10 @@ export async function renderLab(main) {
   main.appendChild(el('h1', {}, 'LLM Trading Agent — Adversarial Research Lab'));
   main.appendChild(
     el('p', { class: 'lede' }, 'Can an LLM trading agent distinguish market evidence from a plausible but unverified market claim, and does that ability degrade when independent corroboration is harder to obtain?')
+  );
+
+  main.appendChild(
+    el('button', { class: 'btn primary', style: 'margin-top:18px;', onclick: () => startJudgeMode() }, 'START 90-SECOND DEMO')
   );
 
   const tags = [

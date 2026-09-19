@@ -15,10 +15,10 @@ export async function renderBreak(main) {
   const resultBox = el('div', { style: 'margin-top:18px;' });
 
   for (const s of scenarios) {
-    const card = el('div', { class: 'panel' }, [
+    const card = el('div', { class: 'panel', 'data-scenario-key': s.key }, [
       el('h3', {}, s.label),
       el('div', { class: 'mono', style: 'font-size:11px; color:var(--text-faint); margin-bottom:12px;' }, `expected: ${s.expected}`),
-      el('button', { class: 'btn danger', onclick: () => runAttack(s.key, card) }, 'RUN ATTACK'),
+      el('button', { class: 'btn danger', 'data-scenario-key': s.key, onclick: () => runAttack(s.key, card) }, 'RUN ATTACK'),
     ]);
     grid.appendChild(card);
   }
