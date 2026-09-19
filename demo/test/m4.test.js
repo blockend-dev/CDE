@@ -10,6 +10,7 @@
 
 const assert = require('assert');
 const { start } = require('../server/httpServer');
+const { fetchRetry: fetch } = require('./testUtil');
 
 let failures = 0;
 async function check(name, fn) {

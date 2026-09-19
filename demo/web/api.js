@@ -1,5 +1,25 @@
+/**
+ * Some server routes shell out to `git` synchronously over a UNC working
+ * directory (cde/phase5/preflight.js's provenance check, via bash.exe —
+ * the same workaround cde/phase4/runManifest.js already needed for the
+ * same UNC-path limitation). That blocks the event loop briefly and can
+ * occasionally drop a request under back-to-back load. One retry after a
+ * short delay is a true network-level fallback, not a masked bug: the
+ * server-side logic is deterministic and re-running it yields the same
+ * real result.
+ */
+async function fetchWithRetry(url, opts, retries = 1) {
+  try {
+    return await fetch(url, opts);
+  } catch (err) {
+    if (retries <= 0) throw err;
+    await new Promise((r) => setTimeout(r, 400));
+    return fetchWithRetry(url, opts, retries - 1);
+  }
+}
+
 export async function api(pathAndQuery, opts) {
-  const res = await fetch(`/api${pathAndQuery}`, opts);
+  const res = await fetchWithRetry(`/api${pathAndQuery}`, opts);
   const body = await res.json();
   if (!res.ok) {
     const err = new Error(body.error || `request failed (${res.status})`);
