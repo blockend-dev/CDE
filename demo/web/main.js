@@ -4,6 +4,7 @@ import { renderPairDetail } from './screens/pairDetail.js';
 import { renderIntegrity } from './screens/integrity.js';
 import { renderBreak } from './screens/break.js';
 import { renderCaseFiles } from './screens/casefiles.js';
+import { renderTimeline } from './screens/timeline.js';
 
 const NAV = [
   { idx: '01', hash: '#/lab', label: 'The Lab', render: renderLab },
@@ -11,6 +12,7 @@ const NAV = [
   { idx: '03', hash: '#/pair', label: 'Counterfactual Lab', render: renderPairDetail },
   { idx: '04', hash: '#/integrity', label: 'Integrity Console', render: renderIntegrity },
   { idx: '05', hash: '#/break', label: 'Break The Experiment', render: renderBreak },
+  { idx: '06', hash: '#/timeline', label: 'Timeline', render: renderTimeline },
 ];
 
 const app = document.getElementById('app');

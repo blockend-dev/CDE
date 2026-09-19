@@ -17,6 +17,7 @@ const integrity = require('./integrity');
 const tamper = require('./tamper');
 const provenance = require('./provenance');
 const baseline = require('./baseline');
+const timeline = require('./timeline');
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 const PORT = Number(process.env.DEMO_PORT || 5175);
@@ -112,6 +113,10 @@ route('GET', '/api/pairs/:pairingKey/baseline', (req, res, params) => {
   } catch (err) {
     sendError(res, 404, err.message);
   }
+});
+
+route('GET', '/api/timeline', (req, res) => {
+  sendJson(res, 200, { timeline: timeline.buildTimeline() });
 });
 
 route('GET', '/api/integrity/identity', (req, res) => {
