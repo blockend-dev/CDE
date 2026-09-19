@@ -123,6 +123,17 @@ a { color: inherit; }
   max-width: 1280px;
 }
 
+@media (max-width: 760px) {
+  .shell { flex-direction: column; }
+  .sidenav { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 12px 0; }
+  .navlist { display: flex; overflow-x: auto; gap: 2px; }
+  .navlink { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .navlink.active { border-left-color: transparent; border-bottom-color: var(--accent); }
+  .main { padding: 20px 16px 60px 16px; }
+  .col-pair.panel { padding: 14px; }
+  #judge-bar { flex-wrap: wrap; padding: 10px 16px; }
+}
+
 /* ---------- typography ---------- */
 
 .eyebrow {
