@@ -52,9 +52,19 @@ function verifyExperiment() {
   }));
 
   let reproducibility;
+  // cde/phase5/runResearchAnalysis.js always writes its result (with a fresh
+  // analyzedAtUtc) to the committed analysis artifact. The demo must be a
+  // read-only consumer of frozen evidence, so the file's exact original
+  // bytes are restored afterwards — the recomputed hash is compared in memory.
+  const originalBytes = fs.readFileSync(dataLoader.ANALYSIS_RESULT_PATH);
   try {
-    const committed = JSON.parse(fs.readFileSync(dataLoader.ANALYSIS_RESULT_PATH, 'utf8'));
-    const fresh = runResearchAnalysis(dataLoader.RUN_DIR, EXPECTED);
+    const committed = JSON.parse(originalBytes.toString('utf8'));
+    let fresh;
+    try {
+      fresh = runResearchAnalysis(dataLoader.RUN_DIR, EXPECTED);
+    } finally {
+      fs.writeFileSync(dataLoader.ANALYSIS_RESULT_PATH, originalBytes);
+    }
     reproducibility = {
       name: 'reproducibility',
       label: 'reproducibility (re-run now vs. committed result)',
