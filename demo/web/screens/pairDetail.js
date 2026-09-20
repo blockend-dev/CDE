@@ -1,4 +1,4 @@
-import { api, el, shortHash } from '../api.js';
+import { api, el, clickable, shortHash } from '../api.js';
 import { renderCounterfactualTab } from './tabs/counterfactualTab.js';
 import { renderChainTab } from './tabs/chainTab.js';
 import { renderXrayTab } from './tabs/xrayTab.js';
@@ -46,7 +46,7 @@ export async function renderPairDetail(main, rest) {
       el('div', { class: 'kv' }, [
         el('dt', {}, 'Symbol'), el('dd', {}, pair.symbol),
         el('dt', {}, 'Market timestamp'), el('dd', {}, pair.marketTimestampUtc),
-        el('dt', {}, 'Condition'), el('dd', {}, el('span', { class: `badge ${pair.condition === 'weekend' ? 'derived' : 'real'}` }, pair.condition.toUpperCase())),
+        el('dt', {}, 'Condition'), el('dd', {}, el('span', { class: `badge ${pair.condition}` }, pair.condition.toUpperCase())),
         el('dt', {}, 'Snapshot id'), el('dd', {}, el('span', { class: 'mono' }, shortHash(pair.candidateSnapshotId, 16))),
       ]),
     ])
@@ -63,7 +63,7 @@ export async function renderPairDetail(main, rest) {
   const body = el('div', { id: 'tab-body' });
   for (const t of TABS) {
     tabBar.appendChild(
-      el('div', { class: `tab${t.key === tabKey ? ' active' : ''}`, onclick: () => (location.hash = `#/pair/${pairingKey}/${t.key}`) }, t.label)
+      clickable('div', { class: `tab${t.key === tabKey ? ' active' : ''}`, 'aria-selected': t.key === tabKey, onclick: () => (location.hash = `#/pair/${pairingKey}/${t.key}`) }, t.label)
     );
   }
   main.appendChild(tabBar);

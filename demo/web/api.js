@@ -39,6 +39,27 @@ export function fmtNum(n, digits = 4) {
   return Number(n).toFixed(digits);
 }
 
+/** Like el(), but for non-native clickable elements (a <div> acting as a button/tab) — adds keyboard focus and Enter/Space activation so they're not mouse-only. */
+export function clickable(tag, attrs, children) {
+  const onclick = attrs.onclick;
+  const node = el(
+    tag,
+    {
+      ...attrs,
+      tabindex: attrs.tabindex ?? '0',
+      role: attrs.role ?? 'button',
+      onkeydown: (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onclick) {
+          e.preventDefault();
+          onclick(e);
+        }
+      },
+    },
+    children
+  );
+  return node;
+}
+
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs || {})) {

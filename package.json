@@ -13,7 +13,7 @@
     "test:phase5": "node cde/test/phase5.test.js",
     "test:precondition": "node research/weekend-informativeness/selfTest.js",
     "demo": "node demo/server/httpServer.js",
-    "test:demo": "node demo/test/m1.test.js && node demo/test/m2.test.js && node demo/test/m3.test.js && node demo/test/m4.test.js && node demo/test/m5.test.js && node demo/test/m6.test.js && node demo/test/m7.test.js && node demo/test/m8.test.js && node demo/test/m9.test.js && node demo/test/m10.test.js"
+    "test:demo": "node demo/test/m1.test.js && node demo/test/m2.test.js && node demo/test/m3.test.js && node demo/test/m4.test.js && node demo/test/m5.test.js && node demo/test/m6.test.js && node demo/test/m7.test.js && node demo/test/m8.test.js && node demo/test/m9.test.js && node demo/test/m10.test.js && node demo/test/m11.test.js"
   },
   "engines": {
     "node": ">=18"

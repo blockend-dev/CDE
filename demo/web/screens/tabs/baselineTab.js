@@ -38,7 +38,7 @@ function col(title, d, accentClass) {
     el('div', { class: 'col-header', style: accentClass ? `color: var(--${accentClass})` : '' }, title),
     el('div', { class: 'kv' }, [
       el('dt', {}, 'Direction'), el('dd', {}, d.direction),
-      el('dt', {}, 'Exposure'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
+      el('dt', {}, 'Exposure (−1..1)'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
       el('dt', {}, 'Confidence'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.confidence))),
     ]),
     d.rationaleSummary ? el('div', { class: 'mono', style: 'font-size:11px; color:var(--text-faint); margin-top:10px;' }, d.rationaleSummary) : null,

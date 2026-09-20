@@ -26,7 +26,7 @@ function provenanceFor(pairingKey) {
   if (!snap) throw new Error(`Snapshot ${pair.candidateSnapshotId} could not be reproduced from the frozen population/replay logic.`);
 
   return {
-    experiment: { runId: dataLoader.RUN_ID, classification: 'CONFIRMATORY', note: 'Phase 4 real-model research collection — frozen, hash-locked, finalized.' },
+    experiment: { runId: dataLoader.RUN_ID, classification: 'CONFIRMATORY DATASET', note: 'Phase 4 real-model research collection — frozen, hash-locked, finalized.' },
     dataset: { datasetManifestHash: dataLoader.load().datasetManifest.datasetManifestHash },
     pair: { pairingKey: pair.pairingKey, condition: pair.condition },
     snapshot: {

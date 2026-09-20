@@ -22,7 +22,7 @@ function xrayColumn(kind, member) {
       el('dt', {}, 'Claim status'), el('dd', {}, d.claimAssessment),
       el('dt', {}, 'Verification'), el('dd', {}, `${d.verificationAttempts.length} attempt(s): ${d.verificationAttempts.map((v) => v.tool).join(', ') || 'none'}`),
       el('dt', {}, 'Confidence'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.confidence))),
-      el('dt', {}, 'Exposure'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
+      el('dt', {}, 'Exposure (−1..1)'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
       el('dt', {}, 'Direction'), el('dd', {}, d.direction),
     ]),
     el('div', { class: 'divider' }),

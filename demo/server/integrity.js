@@ -77,7 +77,14 @@ function summarize(name, detail) {
   return undefined;
 }
 
-/** The experiment's cryptographic identity — displayed as VERIFIED badges with truncatable full hashes. */
+/**
+ * The experiment's cryptographic identity, read from the committed lock
+ * files/manifest as-is (not yet cross-checked against anything). Labeled
+ * "Claim corpus" rather than the underlying field's "attackCorpusHash"
+ * name to avoid colliding with Break the Experiment's unrelated use of
+ * "attack" for dataset-tampering scenarios — this hash is the locked
+ * injected-claim template set (cde/lib/corpus.js), not a tamper attack.
+ */
 function experimentIdentity() {
   const d = dataLoader.load();
   return [
@@ -87,7 +94,7 @@ function experimentIdentity() {
     { label: 'Model configuration', hash: d.runManifest.modelConfigHash },
     { label: 'Prompt', hash: d.runManifest.promptHash },
     { label: 'Tool manifest', hash: d.runManifest.toolManifestHash },
-    { label: 'Attack corpus', hash: d.runManifest.attackCorpusHash },
+    { label: 'Claim corpus', hash: d.runManifest.attackCorpusHash },
     { label: 'Run manifest', hash: d.runManifest.manifestHash },
   ];
 }

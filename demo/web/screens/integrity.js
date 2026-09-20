@@ -3,17 +3,20 @@ import { api, el, shortHash } from '../api.js';
 export async function renderIntegrity(main) {
   main.appendChild(el('div', { class: 'eyebrow' }, 'Research Integrity Console'));
   main.appendChild(el('h1', {}, "Experiment's Cryptographic Identity"));
-  main.appendChild(el('p', { class: 'lede' }, 'Every component that affects this experiment\'s outcome is content-hashed and locked before collection begins. Nothing below is decorative — every check re-executes the real Phase 5 verification code.'));
+  main.appendChild(el('p', { class: 'lede' }, 'Every component that affects this experiment\'s outcome is content-hashed and locked before collection begins. Nothing below is decorative — every check below re-executes the real Phase 5 verification code when you click VERIFY EXPERIMENT.'));
 
   main.appendChild(el('div', { class: 'loading' }, 'Loading identity…'));
   const { identity } = await api('/integrity/identity');
   main.querySelector('.loading').remove();
 
+  main.appendChild(
+    el('p', { style: 'font-size:11.5px; color:var(--text-faint); margin-bottom:8px;' }, 'These hashes are read from the committed lock/manifest files below — not yet independently cross-checked. Click VERIFY EXPERIMENT to actually recompute and verify every one of them right now.')
+  );
   const idPanel = el('div', { class: 'panel' });
   for (const row of identity) {
     idPanel.appendChild(
       el('div', { class: 'hashline', style: 'padding:8px 0; border-bottom:1px solid var(--border-soft);' }, [
-        el('span', { class: 'pill pass' }, [el('span', { class: 'dot' }), 'VERIFIED']),
+        el('span', { class: 'pill pending' }, [el('span', { class: 'dot' }), 'ON RECORD']),
         el('span', { style: 'width:200px; color:var(--text-dim);' }, row.label),
         el('span', { class: 'short mono' }, shortHash(row.hash, 20)),
         el('button', {
@@ -30,8 +33,8 @@ export async function renderIntegrity(main) {
   const verifySection = el('div', { class: 'panel', style: 'margin-top:18px;' });
   const btn = el('button', { class: 'btn primary' }, 'VERIFY EXPERIMENT');
   const resultsBox = el('div', { style: 'margin-top:16px;' });
-  verifySection.appendChild(el('h3', {}, 'Live Verification'));
-  verifySection.appendChild(el('p', { style: 'font-size:12.5px; color:var(--text-dim); margin-bottom:14px;' }, 'Re-runs the real preflight engine (cde/phase5/preflight.js) and re-executes the locked statistical analysis now, comparing its hash to the committed result. Takes several seconds — this is real computation, not a staged animation.'));
+  verifySection.appendChild(el('h3', {}, 'Re-Verify Now'));
+  verifySection.appendChild(el('p', { style: 'font-size:12.5px; color:var(--text-dim); margin-bottom:14px;' }, 'Re-runs the real preflight engine (cde/phase5/preflight.js) and re-executes the locked statistical analysis right now, comparing its hash to the committed result. Takes several seconds — this is real computation, not a staged animation.'));
   verifySection.appendChild(btn);
   verifySection.appendChild(resultsBox);
   main.appendChild(verifySection);

@@ -81,7 +81,7 @@ export async function renderChainTab(body, pair) {
     'Action',
     el('div', { class: 'kv' }, [
       el('dt', {}, 'Direction'), el('dd', {}, d.direction),
-      el('dt', {}, 'Exposure'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
+      el('dt', {}, 'Exposure (−1..1)'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
     ]),
     480
   );

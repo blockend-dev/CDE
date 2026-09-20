@@ -1,4 +1,4 @@
-import { api, el, fmtNum } from '../api.js';
+import { api, el, clickable, fmtNum } from '../api.js';
 
 const FILTER_DEFS = [
   { key: 'condition', label: 'Condition', options: ['', 'weekday', 'weekend'] },
@@ -11,7 +11,7 @@ const FILTER_DEFS = [
 export async function renderCaseFiles(main) {
   main.appendChild(el('div', { class: 'eyebrow' }, 'Replay Case Files'));
   main.appendChild(el('h1', {}, 'All 41 Completed Pairs'));
-  main.appendChild(el('p', { class: 'lede' }, 'Every card is a forensic case file: one frozen snapshot, replayed clean and injected. Filter by regime, attack category, or outcome — this is the full confirmatory dataset, nothing exploratory is mixed in.'));
+  main.appendChild(el('p', { class: 'lede' }, 'Every card is a forensic case file: one frozen snapshot, replayed clean and injected. Filter by regime, claim category, or outcome — this is the full confirmatory dataset, nothing exploratory is mixed in.'));
 
   const filterBar = el('div', { class: 'panel', style: 'display:flex; gap:14px; flex-wrap:wrap; margin:16px 0;' });
   const state = {};
@@ -43,6 +43,10 @@ export async function renderCaseFiles(main) {
     const qs = new URLSearchParams(query).toString();
     const { count, pairs } = await api(`/pairs${qs ? `?${qs}` : ''}`);
     countLine.textContent = `${count} of 41 pairs match`;
+    if (count === 0) {
+      grid.appendChild(el('div', { class: 'empty-state', style: 'grid-column: 1 / -1;' }, 'No pairs match this filter combination. Loosen a filter above — this is the full 41-pair confirmatory dataset, nothing is hidden.'));
+      return;
+    }
     for (const p of pairs) grid.appendChild(card(p));
   }
 
@@ -50,13 +54,13 @@ export async function renderCaseFiles(main) {
 }
 
 function card(p) {
-  return el(
+  return clickable(
     'div',
-    { class: 'case-card', onclick: () => (location.hash = `#/pair/${p.pairingKey}/counterfactual`) },
+    { class: 'case-card', 'aria-label': `${p.symbol}, ${p.condition}, open counterfactual replay`, onclick: () => (location.hash = `#/pair/${p.pairingKey}/counterfactual`) },
     [
       el('div', { class: 'case-card-top' }, [
         el('span', { class: 'case-card-id mono' }, p.symbol),
-        el('span', { class: `badge ${p.condition === 'weekend' ? 'derived' : 'real'}` }, p.condition.toUpperCase()),
+        el('span', { class: `badge ${p.condition}` }, p.condition.toUpperCase()),
       ]),
       el('div', { class: 'mono', style: 'font-size:11px;color:var(--text-faint);margin-bottom:8px;' }, p.claimTemplate ? p.claimTemplate.replace(/_/g, ' ') : ''),
       el('div', { class: 'mono', style: 'font-size:12px; display:flex; justify-content:space-between;' }, [

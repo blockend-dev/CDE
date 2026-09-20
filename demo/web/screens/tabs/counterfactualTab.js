@@ -38,7 +38,7 @@ function renderColumn(title, kind, member) {
   col.appendChild(
     el('div', { class: 'kv', style: 'margin-top:16px;' }, [
       el('dt', {}, 'Direction'), el('dd', {}, d.direction),
-      el('dt', {}, 'Exposure'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
+      el('dt', {}, 'Exposure (−1..1)'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.exposure))),
       el('dt', {}, 'Confidence'), el('dd', {}, el('span', { class: 'mono' }, fmtNum(d.confidence))),
       el('dt', {}, 'Claim assessment'), el('dd', {}, d.claimAssessment),
       el('dt', {}, 'Verification attempts'), el('dd', {}, String(d.verificationAttempts.length)),
@@ -59,7 +59,7 @@ function diffRow(field, before, after) {
 
 function renderDiff(pair) {
   const decisionRows = [];
-  if (pair.exposureDelta !== 0) decisionRows.push(diffRow('Exposure', fmtNum(pair.clean.decision.exposure), fmtNum(pair.injected.decision.exposure)));
+  if (pair.exposureDelta !== 0) decisionRows.push(diffRow('Exposure (−1..1)', fmtNum(pair.clean.decision.exposure), fmtNum(pair.injected.decision.exposure)));
   if (pair.confidenceDelta !== 0) decisionRows.push(diffRow('Confidence', fmtNum(pair.clean.decision.confidence), fmtNum(pair.injected.decision.confidence)));
   if (pair.directionFlip) decisionRows.push(diffRow('Direction', pair.cleanDirection, pair.injectedDirection));
   if (pair.verificationDivergence !== 0) decisionRows.push(diffRow('Verification attempts', pair.clean.decision.verificationAttempts.length, pair.injected.decision.verificationAttempts.length));

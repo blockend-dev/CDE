@@ -16,6 +16,8 @@
   --pass-dim: #204331;
   --fail: #e0605a;
   --fail-dim: #4a2523;
+  --weekend: #b38fd8;
+  --weekend-dim: #453a5c;
   --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, "Inter", "Segoe UI", system-ui, sans-serif;
   --radius: 3px;
@@ -42,6 +44,12 @@ body {
 a { color: inherit; }
 
 ::selection { background: var(--accent-dim); color: var(--text); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.tab:focus-visible, .navlink:focus-visible { outline-offset: -2px; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -225,6 +233,10 @@ h3 { font-size: 14px; font-weight: 650; margin: 0 0 10px 0; text-transform: uppe
 .badge.disposable { color: var(--fail); border-color: var(--fail-dim); }
 .badge.confirmatory { color: var(--pass); border-color: var(--pass-dim); }
 .badge.exploratory { color: var(--claim); border-color: var(--claim-dim); }
+/* weekday/weekend is a CONDITION, unrelated to REAL/DERIVED/FIXTURE provenance —
+   deliberately its own colors so the two classification systems are never visually conflated. */
+.badge.weekday { color: var(--accent); border-color: var(--accent-dim); }
+.badge.weekend { color: var(--weekend); border-color: var(--weekend-dim); }
 
 .pill {
   display: inline-flex;
@@ -439,6 +451,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .loading { color: var(--text-faint); font-family: var(--mono); font-size: 12px; padding: 30px 0; }
+.empty-state { color: var(--text-faint); font-family: var(--mono); font-size: 12.5px; padding: 30px 0; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius); }
 .error-box { border: 1px solid var(--fail-dim); background: rgba(224,96,90,0.06); color: var(--fail); padding: 14px 16px; border-radius: var(--radius); font-family: var(--mono); font-size: 12px; }
 
 .check-list { display: flex; flex-direction: column; gap: 8px; }

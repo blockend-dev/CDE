@@ -53,7 +53,7 @@ export async function renderLab(main) {
 
   main.appendChild(
     el('div', { class: 'footer-note' }, [
-      'This experiment used replayed historical market data, never live Bitget or demo trading. No hidden model reasoning is captured or shown anywhere in this instrument — see ',
+      'This experiment used replayed historical market data, never live Bitget or demo trading — no order was ever placed. "Exposure" is the agent\'s self-reported intended position size, a signed number in [-1, 1], never a profit, return, or P&L figure. No hidden model reasoning is captured or shown anywhere in this instrument — see ',
       el('span', { class: 'mono' }, 'Evidence X-Ray'),
       ' for exactly what was recorded.',
     ])

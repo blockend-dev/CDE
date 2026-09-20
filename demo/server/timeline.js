@@ -49,7 +49,7 @@ function buildTimeline() {
     {
       phase: 'Phase 0',
       title: 'Methodology Lock',
-      note: 'Snapshot contract, condition classifier, claim-blind baseline, attack corpus, pairing identity, tool manifest — locked before any trial existed.',
+      note: 'Snapshot contract, condition classifier, claim-blind baseline, claim-template corpus, pairing identity, tool manifest — locked before any trial existed.',
       hashLabel: 'methodologyLockHash',
       hash: d.methodologyLock.contentHash,
       commit: commitMeta(phase0Sha),

@@ -45,15 +45,24 @@ export async function renderBreak(main) {
 }
 
 function renderResult(result) {
-  const outcome = result.preflightPassed ? 'PASS' : 'FAIL';
   const panel = el('div', { class: 'panel' }, [
-    el('div', { style: 'display:flex; align-items:center; gap:12px; margin-bottom:12px;' }, [
-      el('span', { class: `pill ${result.preflightPassed ? 'pass' : 'fail'}`, style: 'font-size:14px; padding:6px 14px;' }, `PASS → ${outcome}`),
-      el('span', { class: `badge disposable` }, 'DISPOSABLE COPY'),
+    el('div', { style: 'display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;' }, [
+      el('span', { class: 'badge disposable' }, 'MUTATED A DISPOSABLE COPY'),
+      el('span', { style: 'color:var(--text-faint);' }, '— the canonical dataset was never opened for writing.'),
     ]),
     el('h3', {}, result.label),
-    el('p', { style: 'font-size:12.5px; color:var(--text-dim);' }, result.mutationDescription),
+    el('p', { style: 'font-size:12.5px; color:var(--text-dim); margin-bottom:14px;' }, result.mutationDescription),
+    el('div', { style: 'display:flex; align-items:center; gap:14px; font-family:var(--mono); font-size:13px;' }, [
+      el('span', { class: 'pill pass' }, 'CANONICAL: PASS'),
+      el('span', { style: 'color:var(--text-faint);' }, '→'),
+      el('span', { class: `pill ${result.preflightPassed ? 'pass' : 'fail'}` }, `MUTATED COPY: ${result.preflightPassed ? 'PASS' : 'FAIL'}`),
+    ]),
   ]);
+
+  if (result.preflightPassed) {
+    panel.appendChild(el('div', { class: 'divider' }));
+    panel.appendChild(el('p', { style: 'font-size:12.5px; color:var(--claim);' }, 'This mutation did not trip any integrity check — worth investigating rather than hiding.'));
+  }
 
   if (!result.preflightPassed) {
     panel.appendChild(el('div', { class: 'divider' }));

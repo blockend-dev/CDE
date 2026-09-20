@@ -108,7 +108,7 @@ export async function startJudgeMode() {
       waitMs: 7000,
     },
     {
-      label: 'Verifying the experiment — this is a live re-run of the real preflight engine and the locked analysis, not an animation.',
+      label: 'Verifying the experiment — this is happening right now, a real re-run of the preflight engine and the locked analysis, not an animation.',
       hash: '#/integrity',
       action: async () => {
         await sleep(500);
