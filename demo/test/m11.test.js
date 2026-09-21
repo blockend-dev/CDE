@@ -141,6 +141,15 @@ async function main() {
     await new Promise((r) => s.close(r));
   });
 
+  await check('the recorded analysis input order is exactly a permutation of the frozen trials directory (cannot silently drift from the data)', () => {
+    const dl = require('../server/dataLoader');
+    const recorded = require('../server/analysisInputOrder.json').trials;
+    const actual = fs.readdirSync(path.join(dl.RUN_DIR, 'trials'));
+    assert.strictEqual(recorded.length, actual.length);
+    assert.deepStrictEqual([...recorded].sort(), [...actual].sort());
+    assert.strictEqual(new Set(recorded).size, recorded.length);
+  });
+
   await check('every web ES-module import resolves to a real export', () => {
     let problems = 0;
     for (const { p, src } of web.filter((f) => f.p.endsWith('.js'))) {
@@ -165,9 +174,11 @@ async function main() {
     assert.ok(fs.readFileSync(path.join(DEMO, 'web', 'screens', 'casefiles.js'), 'utf8').includes('clickable('));
   });
 
-  await check('npm run demo works on Windows/UNC checkouts: .npmrc pins a script shell that can start there', () => {
-    const rc = fs.readFileSync(path.join(REPO, '.npmrc'), 'utf8');
-    assert.ok(/^script-shell=/m.test(rc));
+  await check('the repo does not pin an OS-specific npm script shell (a hardcoded bash.exe breaks npm run demo on Linux/macOS/WSL)', () => {
+    const rcPath = path.join(REPO, '.npmrc');
+    if (fs.existsSync(rcPath)) assert.ok(!/^script-shell=/m.test(fs.readFileSync(rcPath, 'utf8')));
+    const pkg = JSON.parse(fs.readFileSync(path.join(REPO, 'package.json'), 'utf8'));
+    assert.strictEqual(pkg.scripts.demo, 'node demo/server/httpServer.js');
   });
 
   console.log(`\n${failures === 0 ? 'ALL DEMO M11 TESTS PASSED' : `${failures} TEST(S) FAILED`}`);

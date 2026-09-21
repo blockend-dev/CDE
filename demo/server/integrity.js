@@ -8,10 +8,12 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 
 const { runPreflight } = require('../../cde/phase5/preflight');
 const { runResearchAnalysis } = require('../../cde/phase5/runResearchAnalysis');
 const dataLoader = require('./dataLoader');
+const RECORDED_TRIAL_ORDER = require('./analysisInputOrder.json').trials;
 
 const EXPECTED = {
   methodologyLockHash: '5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54',
@@ -34,6 +36,34 @@ const LABELS = {
   locked_plan_fields_unchanged: 'locked analysis plan fields unchanged',
   provenance_reproducible_and_honest: 'provenance',
 };
+
+/**
+ * The frozen Phase 5 loader reads trial files with an unsorted
+ * fs.readdirSync, and its fixed-seed permutation p-value depends on that
+ * input order. Windows lists this run directory in a different order than
+ * Linux/macOS (which sort), so the committed result reproduces only if the
+ * order it was produced with is replayed. This scopes a replay of that
+ * recorded order (demo/server/analysisInputOrder.json) to a single
+ * synchronous call; it changes no analysis logic and no cde/ file. If the
+ * directory contents no longer match the record, unknown files are appended
+ * and the resulting hash mismatch is reported honestly.
+ */
+function withRecordedTrialOrder(fn) {
+  const recorded = new Set(RECORDED_TRIAL_ORDER);
+  const original = fs.readdirSync;
+  fs.readdirSync = function patchedReaddirSync(p, ...rest) {
+    const listing = original.call(this, p, ...rest);
+    if (typeof p !== 'string' || path.basename(p) !== 'trials') return listing;
+    if (!Array.isArray(listing) || !listing.every((x) => typeof x === 'string')) return listing;
+    const present = new Set(listing);
+    return [...RECORDED_TRIAL_ORDER.filter((n) => present.has(n)), ...listing.filter((n) => !recorded.has(n)).sort()];
+  };
+  try {
+    return fn();
+  } finally {
+    fs.readdirSync = original;
+  }
+}
 
 /**
  * Runs the real preflight engine plus a live reproducibility check
@@ -61,7 +91,7 @@ function verifyExperiment() {
     const committed = JSON.parse(originalBytes.toString('utf8'));
     let fresh;
     try {
-      fresh = runResearchAnalysis(dataLoader.RUN_DIR, EXPECTED);
+      fresh = withRecordedTrialOrder(() => runResearchAnalysis(dataLoader.RUN_DIR, EXPECTED));
     } finally {
       fs.writeFileSync(dataLoader.ANALYSIS_RESULT_PATH, originalBytes);
     }
@@ -69,7 +99,7 @@ function verifyExperiment() {
       name: 'reproducibility',
       label: 'reproducibility (re-run now vs. committed result)',
       pass: fresh.analysisResultHash === committed.analysisResultHash,
-      detail: { committedHash: committed.analysisResultHash, freshHash: fresh.analysisResultHash },
+      detail: { committedHash: committed.analysisResultHash, freshHash: fresh.analysisResultHash, inputOrder: 'recorded at analysis time' },
     };
   } catch (err) {
     reproducibility = { name: 'reproducibility', label: 'reproducibility (re-run now vs. committed result)', pass: false, detail: { error: err.message } };
