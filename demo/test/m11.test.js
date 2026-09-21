@@ -101,6 +101,46 @@ async function main() {
     await new Promise((r) => s.close(r));
   });
 
+  await check('the Baseline tab\'s description matches reality: the control is degenerate (identical neutral/0 output) on all 41 derived snapshots', () => {
+    const baseline = require('../server/baseline');
+    const { pairs } = require('../server/dataLoader').load();
+    const outputs = new Set(pairs.map((p) => {
+      const b = baseline.baselineFor(p.pairingKey).baseline;
+      return `${b.direction}/${b.exposure}/${b.confidence}`;
+    }));
+    assert.deepStrictEqual([...outputs], ['neutral/0/0']);
+    const tab = fs.readFileSync(path.join(DEMO, 'web', 'screens', 'tabs', 'baselineTab.js'), 'utf8');
+    assert.ok(!/market data alone would not/.test(tab), 'must not claim divergence from the control reveals model behavior the market data would not');
+    assert.ok(tab.includes('not a market-signal benchmark'));
+  });
+
+  await check('the Lab\'s context counts are computed from the frozen trials, not hardcoded', async () => {
+    const s = start(0);
+    await new Promise((r) => s.once('listening', r));
+    const base = `http://localhost:${s.address().port}`;
+    const { descriptive } = await (await fetch(`${base}/api/experiment`)).json();
+    const { pairs } = require('../server/dataLoader').load();
+    assert.strictEqual(descriptive.pairsTotal, 41);
+    assert.strictEqual(descriptive.trialsTotal, 82);
+    assert.strictEqual(descriptive.pairsWithNonzeroExposureDelta, pairs.filter((p) => p.exposureDelta !== 0).length);
+    assert.strictEqual(descriptive.trialsNonNeutral, pairs.flatMap((p) => [p.clean, p.injected]).filter((m) => m.decision.direction !== 'neutral').length);
+    assert.ok(!/pairsWithNonzeroExposureDelta:\s*\d/.test(fs.readFileSync(path.join(DEMO, 'server', 'dataLoader.js'), 'utf8')));
+    await new Promise((r) => s.close(r));
+  });
+
+  await check('VERIFY EXPERIMENT leaves the frozen Phase 5 analysis artifact byte-identical (the demo is a read-only consumer)', async () => {
+    const dl = require('../server/dataLoader');
+    const before = fs.readFileSync(dl.ANALYSIS_RESULT_PATH);
+    const s = start(0);
+    await new Promise((r) => s.once('listening', r));
+    const base = `http://localhost:${s.address().port}`;
+    const body = await (await fetch(`${base}/api/integrity/verify`, { method: 'POST' })).json();
+    assert.strictEqual(body.allPassed, true);
+    const after = fs.readFileSync(dl.ANALYSIS_RESULT_PATH);
+    assert.ok(before.equals(after), 'analysis_result.json was modified by the demo');
+    await new Promise((r) => s.close(r));
+  });
+
   await check('every web ES-module import resolves to a real export', () => {
     let problems = 0;
     for (const { p, src } of web.filter((f) => f.p.endsWith('.js'))) {

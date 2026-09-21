@@ -12,7 +12,7 @@ export async function renderBaselineTab(body, pair) {
   }
   body.innerHTML = '';
 
-  body.appendChild(el('p', { class: 'lede', style: 'font-size:12.5px;' }, 'The baseline is structurally incapable of seeing a claim (cde/lib/baseline.js) — it is a falsification control, not "correct" behavior. Any divergence from it is the real model doing something the market data alone would not.'));
+  body.appendChild(el('p', { class: 'lede', style: 'font-size:12.5px;' }, 'The baseline is structurally incapable of seeing a claim (cde/lib/baseline.js), so its clean and injected outputs are identical by construction — it is a claim-blindness control, not "correct" behavior and not a market-signal benchmark. Its inputs here include DERIVED flat candles and zero volume, so it returns neutral / 0 for every snapshot in this replay; it demonstrates the control\'s invariance, not a competing trading signal.'));
 
   body.appendChild(
     el('div', { class: 'grid grid-3', style: 'margin-top:14px;' }, [

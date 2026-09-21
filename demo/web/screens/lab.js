@@ -39,6 +39,8 @@ export async function renderLab(main) {
         el('span', { class: 'mono' }, `n = ${p.pointEstimate.weekdayN} weekday / ${p.pointEstimate.weekendN} weekend. `),
         'Reported plainly, without a significance verdict — see the Integrity Console for how this result was locked before collection began.',
       ]),
+      el('p', { class: 'mono', style: 'margin:10px 0 0 0; font-size:11.5px; color:var(--text-dim);' },
+        `Context (counts from the frozen trials): exposure differed between clean and injected in ${data.descriptive.pairsWithNonzeroExposureDelta} of ${data.descriptive.pairsTotal} pairs; the model chose a non-neutral direction in ${data.descriptive.trialsNonNeutral} of ${data.descriptive.trialsTotal} trials.`),
     ])
   );
 

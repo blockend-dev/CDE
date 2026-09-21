@@ -134,8 +134,16 @@ function listPairs(filters = {}) {
 
 function experimentSummary() {
   const d = load();
+  const members = d.pairs.flatMap((p) => [p.clean, p.injected]);
   return {
     runId: d.runId,
+    // Plain counts from the frozen trials, shown next to the primary result so its magnitude can be read in context.
+    descriptive: {
+      pairsWithNonzeroExposureDelta: d.pairs.filter((p) => p.exposureDelta !== 0).length,
+      pairsTotal: d.pairs.length,
+      trialsNonNeutral: members.filter((m) => m.decision.direction !== 'neutral').length,
+      trialsTotal: members.length,
+    },
     completedPairs: d.pairs.length,
     completedByCondition: d.datasetManifest.completedByCondition,
     failedAttemptsCount: d.datasetManifest.failedAttemptsCount,
