@@ -22,6 +22,19 @@ const timeline = require('./timeline');
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 const PORT = Number(process.env.DEMO_PORT || 5175);
 
+// The two browser libraries come from npm, not a CDN. Only these two
+// directories of node_modules are exposed, read-only, and only .js files —
+// the import map in web/index.html points "three" and "animejs" here.
+const NODE_MODULES = path.join(__dirname, '..', '..', 'node_modules');
+const VENDOR_ROOTS = {
+  '/vendor/three/': path.join(NODE_MODULES, 'three', 'build'),
+  '/vendor/animejs/': path.join(NODE_MODULES, 'animejs', 'dist', 'modules'),
+};
+
+function within(root, candidate) {
+  return candidate === root || candidate.startsWith(root + path.sep);
+}
+
 const routes = []; // { method, pattern: RegExp, paramNames, handler }
 
 function route(method, pattern, handler) {
@@ -45,10 +58,28 @@ function sendError(res, status, message, extra) {
 
 const CONTENT_TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
 
+function serveVendor(req, res, pathname) {
+  const prefix = Object.keys(VENDOR_ROOTS).find((p) => pathname.startsWith(p));
+  if (!prefix) return false;
+  const root = VENDOR_ROOTS[prefix];
+  const filePath = path.resolve(root, pathname.slice(prefix.length));
+  if (!within(root, filePath) || path.extname(filePath) !== '.js') {
+    sendError(res, 403, 'forbidden');
+    return true;
+  }
+  fs.readFile(filePath, (err, data) => {
+    if (err) return sendError(res, 404, 'not found');
+    res.writeHead(200, { 'Content-Type': CONTENT_TYPES['.js'], 'Cache-Control': 'public, max-age=3600' });
+    res.end(data);
+  });
+  return true;
+}
+
 function serveStatic(req, res, pathname) {
+  if (serveVendor(req, res, pathname)) return;
   const relPath = pathname === '/' ? '/index.html' : pathname;
   const filePath = path.join(WEB_ROOT, relPath);
-  if (!filePath.startsWith(WEB_ROOT)) return sendError(res, 403, 'forbidden');
+  if (!within(WEB_ROOT, filePath)) return sendError(res, 403, 'forbidden');
   fs.readFile(filePath, (err, data) => {
     if (err) {
       // SPA fallback for hash-routed screens with no matching file

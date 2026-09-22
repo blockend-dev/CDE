@@ -1,4 +1,5 @@
 import { el, api } from './api.js';
+import { slideUp, swapText } from './visual/motion.js';
 
 /**
  * Judge Mode — a scripted 60-90s walkthrough that navigates through the
@@ -39,13 +40,10 @@ async function pickInterestingPair() {
 }
 
 function buildBar(state) {
-  const bar = el('div', {
-    id: 'judge-bar',
-    style:
-      'position:fixed; left:0; right:0; bottom:0; z-index:1000; background:var(--panel); border-top:1px solid var(--accent-dim); padding:12px 24px; display:flex; align-items:center; gap:16px; font-family:var(--mono); font-size:12px; box-shadow:0 -8px 24px rgba(0,0,0,0.4);',
-  });
-  const stepLabel = el('div', { style: 'color:var(--accent); min-width:80px;' }, `STEP ${state.i + 1}/${state.total}`);
-  const text = el('div', { id: 'judge-text', style: 'flex:1; color:var(--text);' }, state.currentLabel || '');
+  // Styling lives in css/main.css (#judge-bar) and css/glass.css so the bar is part of the glass system.
+  const bar = el('div', { id: 'judge-bar', role: 'status', 'aria-live': 'polite' });
+  const stepLabel = el('div', { class: 'judge-step' }, `STEP ${state.i + 1}/${state.total}`);
+  const text = el('div', { id: 'judge-text', class: 'judge-text' }, state.currentLabel || '');
   const exitBtn = el('button', { class: 'btn ghost', onclick: () => stopJudgeMode() }, 'EXIT — EXPLORE MANUALLY');
   bar.appendChild(stepLabel);
   bar.appendChild(text);
@@ -54,10 +52,10 @@ function buildBar(state) {
 }
 
 function updateBar(i, total, label) {
-  const stepLabel = document.querySelector('#judge-bar > div:first-child');
+  const stepLabel = document.querySelector('#judge-bar .judge-step');
   const text = document.getElementById('judge-text');
   if (stepLabel) stepLabel.textContent = `STEP ${i + 1}/${total}`;
-  if (text) text.textContent = label;
+  if (text) swapText(text, label);
 }
 
 function removeBar() {
@@ -138,6 +136,7 @@ export async function startJudgeMode() {
 
   const bar = buildBar({ i: 0, total: steps.length, currentLabel: steps[0].label });
   document.body.appendChild(bar);
+  slideUp(bar);
 
   for (let i = 0; i < steps.length; i++) {
     if (!active) return;

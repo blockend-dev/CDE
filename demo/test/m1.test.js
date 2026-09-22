@@ -71,9 +71,9 @@ async function main() {
     assert.ok((await res.text()).includes('<div id="app">'));
   });
 
-  await check('GET /styles/main.css and /main.js serve with correct content types', async () => {
-    const css = await fetch(`${base}/styles/main.css`);
-    const js = await fetch(`${base}/main.js`);
+  await check('GET /css/main.css and /js/main.js serve with correct content types', async () => {
+    const css = await fetch(`${base}/css/main.css`);
+    const js = await fetch(`${base}/js/main.js`);
     assert.ok(css.headers.get('content-type').includes('text/css'));
     assert.ok(js.headers.get('content-type').includes('javascript'));
   });

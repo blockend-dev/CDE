@@ -5,11 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CDE — Adversarial Research Lab</title>
   <meta name="description" content="Corroboration Differential Engine — an adversarial research instrument for LLM trading agents." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0c10'/%3E%3Cpath d='M8 22 L14 10 L18 18 L24 8' stroke='%235ec8d8' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/styles/main.css" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/glass.css" />
+  <link rel="stylesheet" href="/css/motion.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+  <!-- three and animejs come from npm (node_modules), served read-only by the demo server under /vendor/. No CDN, no bundler. -->
+  <script type="importmap">
+    { "imports": { "three": "/vendor/three/three.module.js", "animejs": "/vendor/animejs/index.js" } }
+  </script>
 </head>
 <body>
+  <canvas id="scene-canvas" aria-hidden="true"></canvas>
   <div id="app"></div>
-  <script type="module" src="/main.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>

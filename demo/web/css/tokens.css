@@ -1,0 +1,73 @@
+/* Design tokens — the single source of truth for color, glass, elevation,
+   spacing, type and motion. No selectors other than :root live here. */
+:root {
+  /* ---- color: environment ---- */
+  --bg: #07090d;
+  --bg-raised: #0d1016;
+  --panel: #12151c;
+  --panel-2: #171b23;
+  --border: #232833;
+  --border-soft: #1a1e27;
+
+  /* ---- color: text (kept high-contrast; glass never lowers these) ---- */
+  --text: #e8eaee;
+  --text-dim: #9aa2b3;
+  --text-faint: #6a7383;
+
+  /* ---- color: status / evidence semantics ---- */
+  --accent: #5ec8d8;
+  --accent-dim: #2d5a63;
+  --claim: #d8a355;
+  --claim-dim: #5a4a2d;
+  --pass: #57c785;
+  --pass-dim: #204331;
+  --fail: #e0605a;
+  --fail-dim: #4a2523;
+  --weekend: #b38fd8;
+  --weekend-dim: #453a5c;
+
+  /* ---- glass system (layers: environment → scene → shell → panel → elevated → focused) ---- */
+  --glass-bg: rgba(15, 19, 27, 0.54);           /* primary panels */
+  --glass-bg-elevated: rgba(21, 26, 36, 0.7);  /* evidence / focused panels */
+  --glass-bg-shell: rgba(9, 11, 16, 0.72);      /* application chrome */
+  --glass-bg-inset: rgba(255, 255, 255, 0.028); /* rows/tiles inside a panel (no blur of their own) */
+  --glass-bg-solid: #12151c;                    /* fallback when backdrop-filter is unavailable */
+  --glass-blur: 14px;
+  --glass-blur-strong: 22px;
+  --glass-saturate: 1.2;
+  --glass-border: rgba(255, 255, 255, 0.075);
+  --glass-border-strong: rgba(255, 255, 255, 0.15);
+  --glass-highlight: rgba(255, 255, 255, 0.07);  /* 1px top-edge light */
+
+  /* ---- elevation ---- */
+  --shadow-1: 0 1px 0 var(--glass-highlight) inset, 0 10px 28px -14px rgba(0, 0, 0, 0.65);
+  --shadow-2: 0 1px 0 var(--glass-highlight) inset, 0 18px 44px -16px rgba(0, 0, 0, 0.75);
+  --shadow-focus: 0 0 0 1px var(--accent-dim), 0 0 0 4px rgba(94, 200, 216, 0.1);
+
+  /* ---- shape & space ---- */
+  --radius-s: 3px;
+  --radius: 6px;
+  --radius-l: 10px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+
+  /* ---- typography ---- */
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, "Inter", "Segoe UI", system-ui, sans-serif;
+
+  /* ---- motion: short and precise, instrument-like ---- */
+  --dur-fast: 120ms;
+  --dur-med: 220ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-inout: cubic-bezier(0.45, 0, 0.2, 1);
+
+  /* ---- stacking ---- */
+  --z-scene: 0;
+  --z-shell: 1;
+  --z-bar: 1000;
+}

@@ -5,6 +5,7 @@
   "description": "Corroboration Differential Engine research harness",
   "main": "cde/phase1/runExperiment.js",
   "scripts": {
+    "test": "node demo/test/runAll.js",
     "test:phase0": "node cde/test/phase0.test.js",
     "test:phase1": "node cde/test/phase1.test.js",
     "test:phase2": "node cde/test/phase2.test.js",
@@ -13,12 +14,15 @@
     "test:phase5": "node cde/test/phase5.test.js",
     "test:precondition": "node research/weekend-informativeness/selfTest.js",
     "demo": "node demo/server/httpServer.js",
-    "test:demo": "node demo/test/m1.test.js && node demo/test/m2.test.js && node demo/test/m3.test.js && node demo/test/m4.test.js && node demo/test/m5.test.js && node demo/test/m6.test.js && node demo/test/m7.test.js && node demo/test/m8.test.js && node demo/test/m9.test.js && node demo/test/m10.test.js && node demo/test/m11.test.js"
+    "test:demo": "node demo/test/m1.test.js && node demo/test/m2.test.js && node demo/test/m3.test.js && node demo/test/m4.test.js && node demo/test/m5.test.js && node demo/test/m6.test.js && node demo/test/m7.test.js && node demo/test/m8.test.js && node demo/test/m9.test.js && node demo/test/m10.test.js && node demo/test/m11.test.js && node demo/test/m12.test.js && node demo/test/m13.browser.test.js",
+    "test:browser": "node demo/test/m13.browser.test.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.32.1"
+    "@anthropic-ai/sdk": "^0.32.1",
+    "animejs": "^4.5.0",
+    "three": "^0.186.0"
   }
 }

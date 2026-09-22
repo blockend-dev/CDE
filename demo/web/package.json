@@ -1,0 +1,6 @@
+{
+  "name": "cde-demo-web",
+  "private": true,
+  "type": "module",
+  "description": "Browser ES modules. Marked as ESM so Node (tests) and the browser interpret these files identically."
+}

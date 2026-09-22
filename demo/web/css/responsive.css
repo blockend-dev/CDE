@@ -1,0 +1,46 @@
+/* Breakpoints, largest to smallest. Goals: no horizontal overflow at any
+   width, hashes and JSON details wrap instead of clipping, and the judge bar
+   never covers content it cannot scroll past. */
+
+@media (max-width: 1180px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 52px; }
+  .pair-banner { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .col-pair { grid-template-columns: 1fr; }
+  .manip { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .shell { flex-direction: column; }
+  .sidenav { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 12px 0; }
+  .brand { padding: 0 16px 10px 16px; margin-bottom: 8px; }
+  .navlist { display: flex; overflow-x: auto; gap: 2px; scrollbar-width: none; }
+  .navlist::-webkit-scrollbar { display: none; }
+  .navlink { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .navlink.active { border-left-color: transparent; border-bottom-color: var(--accent); }
+  .main { padding: 20px 16px 96px 16px; }
+  .col-pair.panel { padding: 14px; }
+  .hero h1 { font-size: 44px; }
+  .hero .tagline { font-size: 16px; }
+  h1 { font-size: 24px; }
+  #judge-bar { flex-wrap: wrap; padding: 10px 16px; }
+}
+
+@media (max-width: 520px) {
+  .kv { grid-template-columns: 1fr; gap: 2px 0; }
+  .kv dt { margin-top: 8px; }
+  .diff-row { grid-template-columns: 1fr auto 1fr; }
+  .diff-row .diff-field { grid-column: 1 / -1; }
+  .diff-before { text-align: left; }
+  .stat-value { font-size: 19px; }
+  .xp { gap: 6px 8px; }
+  .xp .xp-cell b { font-size: 16px; }
+  .custody-node { grid-template-columns: 20px minmax(0, 1fr); gap: 8px; }
+  .custody-top .pill { margin-left: 0; }
+  .stage-rail { font-size: 9px; letter-spacing: 0.04em; }
+  .check-row .detail { margin-left: 0; flex-basis: 100%; }
+}

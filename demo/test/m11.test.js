@@ -28,6 +28,11 @@ async function check(name, fn) {
   }
 }
 
+function allCss() {
+  const dir = path.join(DEMO, 'web', 'css');
+  return fs.readdirSync(dir).filter((f) => f.endsWith('.css')).sort().map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
+}
+
 function sources(dir, exts) {
   const out = [];
   (function walk(d) {
@@ -51,16 +56,19 @@ async function main() {
       const stripped = src
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/^\s*\/\/.*$/gm, '')
-        .replace(/never a profit, return, or P&L figure/g, '');
+        .replace(/never a profit, return, or P&L figure/g, '')
+        .replace(/\bperformance\.now\(\)/g, ''); // the browser timing API, not a claim
       const m = stripped.match(banned);
       assert.ok(!m, `${path.relative(REPO, p)} contains "${m && m[0]}"`);
     }
   });
 
   await check('the identity list is not stamped VERIFIED before any check has run (only PASS/FAIL after a real verification)', () => {
-    const integrity = fs.readFileSync(path.join(DEMO, 'web', 'screens', 'integrity.js'), 'utf8');
+    const integrity = fs.readFileSync(path.join(DEMO, 'web', 'js', 'screens', 'integrity.js'), 'utf8');
     assert.ok(!/'VERIFIED'/.test(integrity), 'integrity.js must not hardcode a VERIFIED badge');
-    assert.ok(integrity.includes('ON RECORD'));
+    const chain = fs.readFileSync(path.join(DEMO, 'web', 'js', 'components', 'integrityChain.js'), 'utf8');
+    assert.ok(!/'VERIFIED'/.test(chain), 'the chain component must not hardcode a VERIFIED badge');
+    assert.ok(chain.includes('ON RECORD') && chain.includes('RECORDED ONLY'));
     assert.ok(!integrity.includes('Live Verification'));
   });
 
@@ -68,7 +76,7 @@ async function main() {
     for (const { p, src } of web) {
       assert.ok(!/condition === 'weekend' \? 'derived'/.test(src), `${path.relative(REPO, p)} conflates condition with provenance styling`);
     }
-    const css = fs.readFileSync(path.join(DEMO, 'web', 'styles', 'main.css'), 'utf8');
+    const css = allCss();
     assert.ok(css.includes('.badge.weekend') && css.includes('.badge.weekday'));
   });
 
@@ -97,7 +105,7 @@ async function main() {
     const base = `http://localhost:${s.address().port}`;
     const body = await (await fetch(`${base}/api/pairs?condition=weekday&direction=short`)).json();
     assert.strictEqual(body.count, 0);
-    assert.ok(fs.readFileSync(path.join(DEMO, 'web', 'screens', 'casefiles.js'), 'utf8').includes('empty-state'));
+    assert.ok(fs.readFileSync(path.join(DEMO, 'web', 'js', 'screens', 'casefiles.js'), 'utf8').includes('empty-state'));
     await new Promise((r) => s.close(r));
   });
 
@@ -109,7 +117,7 @@ async function main() {
       return `${b.direction}/${b.exposure}/${b.confidence}`;
     }));
     assert.deepStrictEqual([...outputs], ['neutral/0/0']);
-    const tab = fs.readFileSync(path.join(DEMO, 'web', 'screens', 'tabs', 'baselineTab.js'), 'utf8');
+    const tab = fs.readFileSync(path.join(DEMO, 'web', 'js', 'screens', 'tabs', 'baseline.js'), 'utf8');
     assert.ok(!/market data alone would not/.test(tab), 'must not claim divergence from the control reveals model behavior the market data would not');
     assert.ok(tab.includes('not a market-signal benchmark'));
   });
@@ -167,11 +175,11 @@ async function main() {
   });
 
   await check('keyboard focus styling exists and clickable non-button elements are keyboard-operable', () => {
-    const css = fs.readFileSync(path.join(DEMO, 'web', 'styles', 'main.css'), 'utf8');
+    const css = allCss();
     assert.ok(css.includes(':focus-visible'));
-    const api = fs.readFileSync(path.join(DEMO, 'web', 'api.js'), 'utf8');
+    const api = fs.readFileSync(path.join(DEMO, 'web', 'js', 'api.js'), 'utf8');
     assert.ok(/export function clickable/.test(api) && api.includes("'Enter'"));
-    assert.ok(fs.readFileSync(path.join(DEMO, 'web', 'screens', 'casefiles.js'), 'utf8').includes('clickable('));
+    assert.ok(fs.readFileSync(path.join(DEMO, 'web', 'js', 'screens', 'casefiles.js'), 'utf8').includes('clickable('));
   });
 
   await check('the repo does not pin an OS-specific npm script shell (a hardcoded bash.exe breaks npm run demo on Linux/macOS/WSL)', () => {

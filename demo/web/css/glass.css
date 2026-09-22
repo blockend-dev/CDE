@@ -1,0 +1,103 @@
+/* Glass system. Layers, back to front:
+     1 environment  (body, --bg)
+     2 ambient scene (#scene-canvas, WebGL — optional)
+     3 application shell (.sidenav)
+     4 primary panels (.panel)
+     5 elevated evidence panels (.panel.elevated, .chain-node, #judge-bar)
+     6 focused / selected (:focus-visible, .case-card:hover, .tab.active)
+   Only surfaces that sit directly on the scene use backdrop-filter. Rows and
+   tiles inside a panel get a plain translucent tint — no nested blur — so
+   critical data keeps full contrast and the page stays cheap to composite. */
+
+/* When the WebGL field is running it replaces the flat fallback grid. */
+html.scene-on body {
+  background-image: none;
+  background-color: var(--bg);
+}
+/* Vignette keeps the field from competing with text near the edges. */
+html.scene-on body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scene);
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 62% 38%, transparent 0%, rgba(7, 9, 13, 0.18) 62%, rgba(7, 9, 13, 0.6) 100%);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sidenav {
+    background: var(--glass-bg-shell);
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+  }
+
+  .panel {
+    background:
+      radial-gradient(420px circle at var(--mx, 50%) var(--my, -20%), rgba(94, 200, 216, 0.06), transparent 62%),
+      var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+
+  .panel.elevated,
+  .chain-node,
+  #judge-bar {
+    background: var(--glass-bg-elevated);
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+  }
+}
+
+.panel,
+.chain-node {
+  border-color: var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+.panel.elevated,
+#judge-bar { box-shadow: var(--shadow-2); border-color: var(--glass-border-strong); }
+
+.sidenav { border-right-color: var(--glass-border); }
+.sidenav .brand { border-bottom-color: var(--glass-border); }
+
+/* Cards in a grid and tiles inside panels: tint only, no blur. */
+.case-card,
+.stat,
+.check-row,
+.custody-body,
+.xp .xp-cell,
+.pair-banner .side {
+  background: var(--glass-bg-inset);
+  border-color: var(--glass-border);
+}
+.case-card {
+  background:
+    radial-gradient(260px circle at var(--mx, 50%) var(--my, -30%), rgba(94, 200, 216, 0.07), transparent 65%),
+    rgba(15, 19, 27, 0.6);
+  box-shadow: var(--shadow-1);
+}
+.case-card:hover,
+.case-card:focus-visible { border-color: var(--accent-dim); box-shadow: var(--shadow-1), var(--shadow-focus); }
+
+.panel.elevated { border-color: var(--glass-border-strong); }
+
+/* Selected/focused state (layer 6). */
+.tab.active { text-shadow: 0 0 14px rgba(94, 200, 216, 0.35); }
+
+/* Solid fallback when the browser cannot blur what's behind a panel. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sidenav, .panel, .chain-node, #judge-bar { background: var(--glass-bg-solid); }
+}
+
+/* "Lens" glass: a lighter, low-blur surface for the one panel that is meant to be seen
+   through — the Lab's experiment diagram, behind which the 3D four-cell core is anchored. */
+.panel.lens { border-color: var(--glass-border-strong); box-shadow: var(--shadow-2); }
+.panel.lens .xp-cell { background: rgba(8, 10, 14, 0.5); }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel.lens {
+    background: rgba(12, 16, 23, 0.3);
+    -webkit-backdrop-filter: blur(3px) saturate(1.15);
+    backdrop-filter: blur(3px) saturate(1.15);
+  }
+}

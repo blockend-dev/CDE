@@ -5,6 +5,9 @@ import { renderIntegrity } from './screens/integrity.js';
 import { renderBreak } from './screens/break.js';
 import { renderCaseFiles } from './screens/casefiles.js';
 import { renderTimeline } from './screens/timeline.js';
+import { initScene, scene } from './visual/scene.js';
+import { initGlass } from './visual/glass.js';
+import { enter, cancelAll } from './visual/motion.js';
 
 const NAV = [
   { idx: '01', hash: '#/lab', label: 'The Lab', render: renderLab },
@@ -18,7 +21,7 @@ const NAV = [
 const app = document.getElementById('app');
 
 function buildShell() {
-  const sidenav = el('nav', { class: 'sidenav' }, [
+  const sidenav = el('nav', { class: 'sidenav', 'aria-label': 'Primary' }, [
     el('div', { class: 'brand' }, [
       el('div', { class: 'brand-mark' }, 'CDE // Adversarial Lab'),
       el('div', { class: 'brand-sub' }, 'Corroboration Differential Engine'),
@@ -38,7 +41,7 @@ function renderNav() {
     const active = current.startsWith(item.hash);
     list.appendChild(
       el('li', {}, [
-        el('a', { class: `navlink${active ? ' active' : ''}`, href: item.hash }, [el('span', { class: 'idx' }, item.idx), item.label]),
+        el('a', { class: `navlink${active ? ' active' : ''}`, href: item.hash, 'aria-current': active ? 'page' : null }, [el('span', { class: 'idx' }, item.idx), item.label]),
       ])
     );
   }
@@ -52,16 +55,23 @@ function currentRoute() {
 }
 
 async function renderRoute() {
+  cancelAll(); // stop every in-flight animation from the screen we are leaving
+  scene.restore(); // and return the ambient field to its resting state
   renderNav();
   const main = document.getElementById('main');
-  main.innerHTML = '';
+  // Each render gets its own container. If the user navigates again while an
+  // older screen is still loading, that screen writes into a detached node
+  // and can never paint over the new one.
+  const screen = el('div', { class: 'screen' });
+  main.replaceChildren(screen);
+  enter(screen);
   const route = currentRoute();
   const hash = location.hash || NAV[0].hash;
   const rest = hash.slice(route.hash.length).replace(/^\//, '');
   try {
-    await route.render(main, rest);
+    await route.render(screen, rest);
   } catch (err) {
-    main.appendChild(el('div', { class: 'error-box' }, `Failed to render screen: ${err.message}`));
+    screen.appendChild(el('div', { class: 'error-box' }, `Failed to render screen: ${err.message}`));
     console.error(err);
   }
 }
@@ -69,7 +79,11 @@ async function renderRoute() {
 window.addEventListener('hashchange', renderRoute);
 
 buildShell();
-if (!location.hash) location.hash = NAV[0].hash;
+initGlass();
+if (!location.hash) history.replaceState(null, '', NAV[0].hash); // no hashchange event, so no double render
 renderRoute();
+// The ambient scene starts in parallel and never blocks first paint; any
+// scene state a screen requested before it was ready is replayed on start.
+initScene(document.getElementById('scene-canvas'));
 
 export { NAV };

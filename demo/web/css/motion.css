@@ -1,0 +1,44 @@
+/* Motion. Entrances and sequencing are driven by Anime.js (js/visual/motion.js)
+   and by the Three.js scene; CSS only owns cheap state transitions.
+   Nothing here hides content by default — if a script fails, everything is
+   simply visible. */
+
+.navlink,
+.tab,
+button,
+.btn,
+.case-card,
+.custody-body,
+.pill {
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.case-card:hover { transform: translateY(-1px); }
+button:active:not(:disabled),
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+/* The "checking" state of a chain-of-custody node is deliberately STATIC (a lit pip plus the
+   CHECKING… label). Nothing loops inside a glass panel: any repeating animation under a
+   backdrop-filter forces the browser to re-blur that region every frame, which on machines
+   without a GPU is enough to starve the server that is doing the real verification work.
+   Motion is reserved for state CHANGES (see js/visual/motion.js). */
+
+/* Reduced motion: keep every state change and piece of feedback, drop
+   everything that is only movement. JS reads the same media query
+   (js/visual/motion.js) and skips animation/scene motion accordingly. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .case-card:hover { transform: none; }
+}

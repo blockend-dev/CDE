@@ -35,7 +35,59 @@ const LABELS = {
   no_phase4_or_5_redefinition_of_locked_metrics: 'no post-hoc redefinition of locked metrics',
   locked_plan_fields_unchanged: 'locked analysis plan fields unchanged',
   provenance_reproducible_and_honest: 'provenance',
+  reproducibility: 'reproducibility re-run',
 };
+
+/**
+ * The eight components of the experiment's chain of custody, in order, and
+ * the REAL preflight checks that verify each one. Nothing is asserted here
+ * that a check does not actually establish:
+ *   - prompt has no independent check (it is only folded into the model
+ *     configuration hash), so it stays "recorded only" — never a fake PASS;
+ *   - tools and model are both covered by the configuration-consistency
+ *     check (tool manifest / model config identical across every trial);
+ *   - the claim corpus is hashed inside the methodology lock, so the
+ *     methodology-lock check covers it;
+ *   - the run manifest node is represented by what it governs — the
+ *     stopping-rule outcome (sample counts, failed attempt preserved).
+ */
+const COMPONENTS = [
+  { key: 'methodology', identityLabel: 'Methodology lock', chainLabel: 'Methodology', checks: ['methodology_lock_matches_frozen'] },
+  { key: 'analysis', identityLabel: 'Analysis lock', chainLabel: 'Analysis', checks: ['analysis_lock_matches_frozen', 'locked_plan_fields_unchanged', 'reproducibility'] },
+  { key: 'dataset', identityLabel: 'Dataset manifest', chainLabel: 'Dataset', checks: ['dataset_manifest_hash_matches_expected', 'no_duplicate_identities', 'pairing_invariants_hold', 'finalized_dataset_matches_pipeline_input'] },
+  { key: 'model', identityLabel: 'Model configuration', chainLabel: 'Model', checks: ['config_uniform_across_completed_pairs'] },
+  { key: 'prompt', identityLabel: 'Prompt', chainLabel: 'Prompt', checks: [] },
+  { key: 'tools', identityLabel: 'Tool manifest', chainLabel: 'Tools', checks: ['config_uniform_across_completed_pairs'] },
+  { key: 'corpus', identityLabel: 'Claim corpus', chainLabel: 'Corpus', checks: ['methodology_lock_matches_frozen'] },
+  { key: 'stopping', identityLabel: 'Run manifest', chainLabel: 'Run · stopping rule', checks: ['sample_counts_21_weekday_20_weekend', 'failed_attempt_excluded_and_preserved', 'no_phase4_or_5_redefinition_of_locked_metrics'] },
+];
+
+// When the analysis pipeline refuses to run at all (mixed configuration), the
+// refusal names the offending field; map it to the components it concerns.
+const REFUSAL_FIELD_TO_COMPONENTS = {
+  methodologyLockHash: ['methodology', 'corpus'],
+  toolManifestHash: ['tools'],
+  modelConfigHash: ['model'],
+};
+
+/**
+ * Per-component status derived from real check results:
+ *   pass | fail | unchecked (no independent check exists) | notrun (its checks never ran)
+ */
+function componentStatuses(results, { refusalField } = {}) {
+  const byName = new Map(results.map((r) => [r.name, r.pass]));
+  const refused = new Set(refusalField ? REFUSAL_FIELD_TO_COMPONENTS[refusalField] || [] : []);
+  return COMPONENTS.map((c) => {
+    let status;
+    if (c.checks.length === 0) status = 'unchecked';
+    else if (refused.has(c.key)) status = 'fail';
+    else {
+      const ran = c.checks.filter((n) => byName.has(n));
+      status = ran.length === 0 ? 'notrun' : ran.every((n) => byName.get(n)) ? 'pass' : 'fail';
+    }
+    return { key: c.key, label: c.chainLabel, status, verifiedBy: c.checks.map((n) => LABELS[n] || n) };
+  });
+}
 
 /**
  * The frozen Phase 5 loader reads trial files with an unsorted
@@ -106,7 +158,7 @@ function verifyExperiment() {
   }
   checks.push(reproducibility);
 
-  return { allPassed: checks.every((c) => c.pass), checks };
+  return { allPassed: checks.every((c) => c.pass), checks, components: componentStatuses(checks) };
 }
 
 function summarize(name, detail) {
@@ -127,16 +179,23 @@ function summarize(name, detail) {
  */
 function experimentIdentity() {
   const d = dataLoader.load();
-  return [
-    { label: 'Methodology lock', hash: d.methodologyLock.contentHash },
-    { label: 'Analysis lock', hash: d.analysisLock.contentHash },
-    { label: 'Dataset manifest', hash: d.datasetManifest.datasetManifestHash },
-    { label: 'Model configuration', hash: d.runManifest.modelConfigHash },
-    { label: 'Prompt', hash: d.runManifest.promptHash },
-    { label: 'Tool manifest', hash: d.runManifest.toolManifestHash },
-    { label: 'Claim corpus', hash: d.runManifest.attackCorpusHash },
-    { label: 'Run manifest', hash: d.runManifest.manifestHash },
-  ];
+  const hashes = {
+    'Methodology lock': d.methodologyLock.contentHash,
+    'Analysis lock': d.analysisLock.contentHash,
+    'Dataset manifest': d.datasetManifest.datasetManifestHash,
+    'Model configuration': d.runManifest.modelConfigHash,
+    Prompt: d.runManifest.promptHash,
+    'Tool manifest': d.runManifest.toolManifestHash,
+    'Claim corpus': d.runManifest.attackCorpusHash,
+    'Run manifest': d.runManifest.manifestHash,
+  };
+  return COMPONENTS.map((c) => ({
+    key: c.key,
+    label: c.identityLabel,
+    chainLabel: c.chainLabel,
+    hash: hashes[c.identityLabel],
+    verifiedBy: c.checks.map((n) => LABELS[n] || n),
+  }));
 }
 
-module.exports = { verifyExperiment, experimentIdentity, EXPECTED };
+module.exports = { verifyExperiment, experimentIdentity, componentStatuses, COMPONENTS, EXPECTED };

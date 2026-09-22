@@ -1,4 +1,5 @@
 import { el, fmtNum } from '../../api.js';
+import { staggerIn, flash } from '../../visual/motion.js';
 
 export async function renderCounterfactualTab(body, pair) {
   const cols = el('div', { class: 'col-pair panel' }, [
@@ -11,6 +12,14 @@ export async function renderCounterfactualTab(body, pair) {
   body.appendChild(renderDiff(pair));
 
   body.appendChild(el('div', { class: 'footer-note' }, 'Only externally observable structured fields are shown — no chain-of-thought is captured anywhere in this experiment.'));
+
+  // Tool traces run in step (clean and injected side by side); then each field that actually changed is highlighted.
+  const traceCols = cols.querySelectorAll(':scope > div');
+  traceCols.forEach((col) => staggerIn(col.querySelectorAll('.trace-step'), { each: 90, from: -6, axis: 'translateX' }));
+  body.querySelectorAll('.diff-row .diff-after').forEach((cell, i) => {
+    // claim status differs on every pair by construction (the clean trial never sees a claim) — never highlighted as a finding
+    if (!cell.closest('[data-claim-status]')) flash(cell, 'rgba(216, 163, 85, 0.28)', 520 + i * 140);
+  });
 }
 
 function renderColumn(title, kind, member) {
@@ -70,7 +79,7 @@ function renderDiff(pair) {
 
   panel.appendChild(el('div', { class: 'divider' }));
   panel.appendChild(
-    el('div', { class: 'diff-row', style: 'opacity:0.75;' }, [
+    el('div', { class: 'diff-row', style: 'opacity:0.75;', 'data-claim-status': '' }, [
       el('div', { class: 'diff-field' }, 'Claim status'),
       el('div', { class: 'diff-before' }, pair.cleanClaimAssessment),
       el('div', { class: 'diff-arrow' }, '→'),

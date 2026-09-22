@@ -53,25 +53,25 @@ async function main() {
   });
 
   await check('break.js actually renders a button with data-scenario-key="modify-trial" for judgeMode.js to click', () => {
-    const source = read('screens/break.js');
+    const source = read('js/screens/break.js');
     assert.ok(/data-scenario-key['"]?\s*:\s*s\.key/.test(source), 'break.js must stamp data-scenario-key on its attack buttons for Judge Mode to target them');
   });
 
   await check('integrity.js actually renders a button whose text is exactly "VERIFY EXPERIMENT" for judgeMode.js to click', () => {
-    const source = read('screens/integrity.js');
+    const source = read('js/screens/integrity.js');
     assert.ok(source.includes('VERIFY EXPERIMENT'), 'judgeMode.js searches button text for "VERIFY EXPERIMENT" — integrity.js must keep this exact label');
   });
 
   await check('judgeMode.js exports startJudgeMode and stopJudgeMode, and lab.js wires the START button to it', () => {
-    const jm = read('judgeMode.js');
+    const jm = read('js/judgeMode.js');
     assert.ok(/export (async )?function startJudgeMode/.test(jm));
     assert.ok(/export function stopJudgeMode/.test(jm));
-    const lab = read('screens/lab.js');
+    const lab = read('js/screens/lab.js');
     assert.ok(lab.includes('startJudgeMode'), 'lab.js must import and call startJudgeMode from its START button');
   });
 
   await check('every hash the script navigates to is a route main.js actually recognizes', () => {
-    const jm = read('judgeMode.js');
+    const jm = read('js/judgeMode.js');
     const hashes = [...jm.matchAll(/hash:\s*[`'"]([^`'"]*)[`'"]?/g)].map((m) => m[1]);
     const staticHashes = hashes.filter((h) => !h.includes('${'));
     for (const h of staticHashes) assert.ok(['#/lab', '#/integrity', '#/break'].includes(h), `unexpected static hash in judgeMode.js: ${h}`);

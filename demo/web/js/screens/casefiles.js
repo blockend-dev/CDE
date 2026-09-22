@@ -1,4 +1,5 @@
 import { api, el, clickable, fmtNum } from '../api.js';
+import { staggerIn } from '../visual/motion.js';
 
 const FILTER_DEFS = [
   { key: 'condition', label: 'Condition', options: ['', 'weekday', 'weekend'] },
@@ -48,6 +49,7 @@ export async function renderCaseFiles(main) {
       return;
     }
     for (const p of pairs) grid.appendChild(card(p));
+    staggerIn(grid.children, { each: 16, from: 6, duration: 220 });
   }
 
   await refresh();

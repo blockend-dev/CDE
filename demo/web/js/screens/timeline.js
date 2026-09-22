@@ -1,4 +1,5 @@
 import { api, el, shortHash } from '../api.js';
+import { staggerIn } from '../visual/motion.js';
 
 export async function renderTimeline(main) {
   main.appendChild(el('div', { class: 'eyebrow' }, 'Experiment Timeline'));
@@ -13,7 +14,7 @@ export async function renderTimeline(main) {
   timeline.forEach((p, i) => {
     chain.appendChild(el('div', { class: 'chain-connector' }));
     chain.appendChild(
-      el('div', { class: 'chain-node', style: `animation-delay:${i * 90}ms` }, [
+      el('div', { class: 'chain-node' }, [
         el('div', { class: 'chain-node-title' }, `${p.phase} — ${p.title}`),
         el('p', { style: 'font-size:12.5px; color:var(--text-dim); margin:0 0 10px 0;' }, p.note),
         el('div', { class: 'kv' }, [
@@ -26,4 +27,5 @@ export async function renderTimeline(main) {
     );
   });
   main.appendChild(chain);
+  staggerIn(chain.querySelectorAll('.chain-node'), { each: 90, from: 8 });
 }
