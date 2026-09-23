@@ -12,6 +12,7 @@
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .col-pair { grid-template-columns: 1fr; }
   .manip { grid-template-columns: 1fr; }
+  .scope-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
@@ -27,7 +28,11 @@
   .hero h1 { font-size: 44px; }
   .hero .tagline { font-size: 16px; }
   h1 { font-size: 24px; }
-  #judge-bar { flex-wrap: wrap; padding: 10px 16px; }
+  #judge-bar { padding: 8px 16px 10px 16px; }
+  #judge-bar .judge-head { align-items: flex-start; }
+  #judge-bar .judge-stage:not(.active) .t { display: none; }
+  #judge-bar .judge-line { flex-direction: column; gap: 2px; }
+  body:has(#judge-bar) .main { padding-bottom: 260px; }
 }
 
 @media (max-width: 520px) {

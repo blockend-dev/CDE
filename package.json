@@ -2,8 +2,9 @@
   "name": "cde",
   "version": "0.1.0",
   "private": true,
-  "description": "Corroboration Differential Engine research harness",
+  "description": "Corroboration Differential Engine — an adversarial research and evaluation harness for whether an LLM trading agent's response to an injected market claim changes with price-discovery corroboration availability.",
   "main": "cde/phase1/runExperiment.js",
+  "license": "Apache-2.0",
   "scripts": {
     "test": "node demo/test/runAll.js",
     "test:phase0": "node cde/test/phase0.test.js",

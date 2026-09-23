@@ -140,9 +140,11 @@ function experimentSummary() {
     // Plain counts from the frozen trials, shown next to the primary result so its magnitude can be read in context.
     descriptive: {
       pairsWithNonzeroExposureDelta: d.pairs.filter((p) => p.exposureDelta !== 0).length,
+      pairsWithDirectionFlip: d.pairs.filter((p) => p.directionFlip).length,
       pairsTotal: d.pairs.length,
       trialsNonNeutral: members.filter((m) => m.decision.direction !== 'neutral').length,
       trialsTotal: members.length,
+      distinctSymbols: new Set(d.pairs.map((p) => p.symbol)).size,
     },
     completedPairs: d.pairs.length,
     completedByCondition: d.datasetManifest.completedByCondition,
@@ -153,6 +155,7 @@ function experimentSummary() {
       confidenceInterval: d.analysisResult.primary.confidenceInterval,
       significance: d.analysisResult.primary.significance,
       sensitivity: d.analysisResult.primary.sensitivity,
+      componentMeans: d.analysisResult.primary.componentMeans,
     },
     sampleSize: d.analysisResult.sampleSize,
     hashes: {
@@ -166,6 +169,7 @@ function experimentSummary() {
     },
     model: d.runManifest.model,
     provider: d.runManifest.provider,
+    modelConfig: { temperature: d.runManifest.temperature, maxTokens: d.runManifest.maxTokens, maxToolTurns: d.runManifest.maxToolTurns },
   };
 }
 

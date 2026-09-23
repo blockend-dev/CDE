@@ -314,15 +314,47 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   z-index: var(--z-bar);
   background: var(--panel);
   border-top: 1px solid var(--accent-dim);
-  padding: 12px 24px;
+  padding: 10px 24px 12px 24px;
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 8px;
   font-family: var(--mono);
   font-size: 12px;
 }
+body:has(#judge-bar) .main { padding-bottom: 190px; }
+#judge-bar .judge-head { display: flex; align-items: center; gap: 16px; }
+#judge-bar .judge-stages { display: flex; flex: 1; flex-wrap: wrap; gap: 4px 6px; margin: 0; padding: 0; list-style: none; min-width: 0; }
+#judge-bar .judge-stage { display: flex; align-items: baseline; gap: 6px; padding: 2px 8px; border: 1px solid var(--glass-border); border-radius: var(--radius-s); color: var(--text-faint); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+#judge-bar .judge-stage .n { color: inherit; }
+#judge-bar .judge-stage.done { color: var(--pass); border-color: var(--pass-dim); }
+#judge-bar .judge-stage.active { color: var(--accent); border-color: var(--accent); background: rgba(94, 200, 216, 0.08); }
+#judge-bar .judge-line { display: flex; align-items: baseline; gap: 16px; }
 #judge-bar .judge-step { color: var(--accent); min-width: 80px; }
 #judge-bar .judge-text { flex: 1; color: var(--text); min-width: 0; }
+
+/* ---------- Lab: assurance, scope, reading of the result ---------- */
+
+.hero .motto { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em; color: var(--accent); margin: 0 0 var(--space-3) 0; }
+.assurance { padding: var(--space-3) var(--space-4); }
+.replay-notice { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); }
+.replay-notice .replay-text { min-width: 0; }
+.note-list { margin: 0; padding-left: 18px; color: var(--text-dim); font-size: 13px; }
+.note-list li { margin: 0 0 var(--space-2) 0; }
+.note-list li:last-child { margin-bottom: 0; }
+.note-list b { color: var(--text); font-weight: 600; }
+.boundary-note { margin: var(--space-3) 0 0 0; padding-top: var(--space-3); border-top: 1px solid var(--glass-border); font-size: 12.5px; color: var(--text); }
+.scope-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--space-5); }
+.col-header.muted { color: var(--text-faint); }
+.stat-note { margin-top: 6px; font-size: 11px; color: var(--text-faint); }
+.reading { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--glass-border); }
+.reading p { margin: 0 0 var(--space-2) 0; font-size: 13px; color: var(--text); max-width: 760px; }
+.reading p.context { font-size: 11.5px; color: var(--text-dim); }
+.reading a { color: var(--accent); }
+
+.table-wrap { overflow-x: auto; }
+.order-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.order-table th { text-align: left; padding: 6px 12px 6px 0; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); border-bottom: 1px solid var(--border); }
+.order-table td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--border-soft); color: var(--text); vertical-align: top; }
 
 /* ---------- integrity chain of custody ---------- */
 

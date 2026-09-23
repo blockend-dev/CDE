@@ -1,0 +1,86 @@
+# Reproducibility
+
+What is frozen, what is hash-checked, what is deterministic, and the one known place where re-running this analysis does not reproduce a single bit-identical number. Written so a skeptical, quantitative reader can verify these claims themselves rather than take them on faith.
+
+## The frozen-artifact concept
+
+`cde/` and `research/` are treated as an immutable experimental record, not a live codebase. Once a run completes and its analysis is committed, nothing under `cde/runs/<runId>/`, `cde/analysis/results/<runId>/`, or `research/weekend-informativeness/output/` is edited — corrections, if ever needed, would be a new, separately-dated run, never an in-place edit of this one. This repository as published contains exactly one completed research run: `cde/runs/run-2026-09-19T155659111Z/`.
+
+## Input hashes — what was locked before any trial ran
+
+Every input that could affect the outcome is content-hashed and locked **before** collection begins (`cde/lib/methodologyLock.js`, `cde/analysis/lib/analysisLock.js`):
+
+| Lock | Hash | Covers |
+|---|---|---|
+| Methodology | `5acc71b0ee54949c04535e10d4fae00e6b85cb79728dbdc5df4b2e455d969d54` | The experimental design: conditions, pairing, corpus, snapshot contract (`cde/METHODOLOGY.md`). |
+| Analysis plan | `43e0479499d286f4dfe06fd8ec4a036941cd3df1ff0b8afeaee423e2e167fdd7` | The pre-registered statistical method: estimand, test, CI method, stopping rule (`cde/analysis/ANALYSIS_PLAN.md`). |
+
+Per-run configuration (`cde/runs/<runId>/manifest.json`) additionally hashes the model configuration, the prompt, the tool manifest, and the claim corpus used for that specific run, so a reader can confirm every one of the 41 pairs ran under one identical configuration rather than a silently-drifting one.
+
+## Output hash — what the committed result claims to be
+
+`cde/analysis/results/<runId>/analysis_result.json` carries its own `analysisResultHash`: **`b86deb65b4dc9a416e0a6c8845107cfb8b8fbf225a43ce50979cc1cb7317abd2`**. It hashes the primary and secondary results together with an `analysisCodeFingerprint` — a hash of the exact analysis source files (`cde/lib/metrics.js` plus every file under `cde/analysis/lib/`) that produced it. If either the data or the analysis code the result was computed from changes even slightly, the hash changes, and any reproduction attempt reveals the mismatch instead of silently reporting a different number under the same label.
+
+## The dataset manifest
+
+`cde/runs/<runId>/dataset_manifest.json` hashes the finalized set of 41 completed pairs (21 weekday, 20 weekend) plus the one preserved failed attempt (`datasetManifestHash: 99d3d5af659c28a91697783f5da850a719a173cce772f3e55990e96459e2daf2`). The demo's Integrity Console re-derives this from the raw trial files on every verification click, rather than trusting the stored value.
+
+## The recorded input order
+
+`demo/server/analysisInputOrder.json` records the exact order (a list of 41 trial-file names) the committed `analysis_result.json` was produced under — the order Windows happened to list this run's `trials/` directory in on the machine the research run was executed on. This file exists only because the next section's issue was discovered; it changes no analysis logic and is itself just a record.
+
+## The known issue: the permutation p-value is order-sensitive
+
+**Root cause.** `cde/phase5/preflight.js`'s `readJsonDir()` calls `fs.readdirSync()` on the `trials/` directory without sorting the result. `cde/analysis/lib/resampling.js`'s `permutationTest()` builds one pooled array from the weekday and weekend groups, in whatever order they were handed to it, and shuffles that pooled array with a fixed-seed PRNG (`seed: 424242`, from `cde/analysis/lib/analysisLock.js`). Different input orders therefore produce different — but equally valid — draws from the same permutation distribution, and hence slightly different p-values from the same fixed seed.
+
+**What actually varies, measured by re-running the unmodified analysis code** (`cde/analysis/lib/runAnalysis.js`, in memory, against the same frozen trial files, under different input orders — the reproduction command below does exactly this):
+
+| Input order | DiD | 95% CI | permutation p |
+|---|---|---|---|
+| Recorded (Windows, as at analysis time — the committed result) | −0.0025 | [−0.0075, 0.0000] | **0.4909** |
+| Filename-sorted (what Linux/macOS produce) | −0.0025 | [−0.0075, 0.0000] | 0.4776 |
+| Reverse filename-sorted | −0.0025 | [−0.0075, 0.0000] | 0.4941 |
+| 60 further random shuffles (fixed seed 20260921, for reproducible reporting) | −0.0025 (every run) | identical (every run) | range 0.4776–0.4966, mean ≈0.488, sd ≈0.0052 |
+
+**Scale check.** The Monte Carlo standard error of a permutation p-value near 0.49 with 10,000 permutations is `√(p(1−p)/N) ≈ 0.005`. The observed spread across every order tested (≈0.005–0.006) matches that expected sampling noise almost exactly. This is the signature of finite-sample Monte Carlo variance, not of a logic error — a logic error would not track the theoretical standard error this closely.
+
+## What is invariant across every order tested
+
+- The point estimate, **DiD = −0.0025**, in every one of the 63 orders above (3 named + 60 random shuffles).
+- The 95% bootstrap CI, **[−0.0075, 0.0000]**, in every one of the same 63 orders. The bootstrap resamples within each condition group independently (`cde/analysis/lib/resampling.js: bootstrapCI`) and never touches the pooled cross-group ordering the permutation test depends on, which is exactly why it does not move.
+- Every secondary metric's significance verdict: all five secondary tests (`meanAbsExposureDelta`, `meanConfidenceDelta`, `verificationDivergence`, `directionalFlipRate`, `claimAcceptanceRate`) carry a Holm-adjusted p of 1 in the committed result — none are affected in substance by a ≈0.006 shift in the primary p-value.
+- Every hash in [Input hashes](#input-hashes--what-was-locked-before-any-trial-ran) and [Output hash](#output-hash--what-the-committed-result-claims-to-be) — those are content hashes over data and code, unrelated to runtime iteration order.
+
+## What is not invariant
+
+Only the two-sided permutation p-value, and only within the range shown above (≈0.4776–0.4966 across every order tested). Nothing else — not the estimate, not the interval, not any secondary conclusion, not any dataset or code hash — has been found to vary.
+
+## No modification of frozen artifacts
+
+This finding is disclosed, not fixed, in the frozen code:
+
+- `cde/phase5/preflight.js` is unmodified. Its unsorted `readdirSync` is exactly as it was when the committed result was produced.
+- `cde/analysis/lib/resampling.js`, `runAnalysis.js`, and every other frozen analysis file are unmodified.
+- The committed `cde/analysis/results/<runId>/analysis_result.json` — including its reported p-value of 0.4909 — is unchanged.
+- The only new files this disclosure required are `demo/server/analysisInputOrder.json` (the recorded order, added earlier) and `demo/server/orderSensitivity.js` (a read-only, in-memory re-run of the unmodified analysis under several orders, added in this pass, used by the demo's Integrity Console and documented here).
+
+## Reproduce this yourself
+
+From a checkout with `npm install` already run, from the repository root:
+
+```
+node -e "
+const fs = require('fs');
+const { runAnalysis } = require('./cde/analysis/lib/runAnalysis');
+const runDir = 'cde/runs/run-2026-09-19T155659111Z';
+const names = fs.readdirSync(runDir + '/trials').filter(f => f.endsWith('.json')).sort();
+const trials = names.map(f => JSON.parse(fs.readFileSync(runDir + '/trials/' + f, 'utf8')));
+const failures = fs.readdirSync(runDir + '/failures').filter(f => f.endsWith('.json')).map(f => JSON.parse(fs.readFileSync(runDir + '/failures/' + f, 'utf8')));
+const r = runAnalysis([...trials, ...failures]);
+console.log('DiD', r.primary.pointEstimate.did, 'p', r.primary.significance.twoSided.pValue);
+"
+```
+
+On Linux/macOS this prints `DiD -0.0025 p 0.47755224477552244` — the filename-sorted row above, since `.sort()` is explicit in this snippet. Compare against the committed value in `cde/analysis/results/run-2026-09-19T155659111Z/analysis_result.json`'s `primary.significance.twoSided.pValue` field (`0.49085091490850913`) to see the order-dependence directly. This command reads only frozen files and writes nothing.
+
+For the interactive version — a live re-run of the real preflight engine plus a comparison against the committed hash, and a one-click re-run under three named orders plus 60 shuffles — start the demo (`npm run demo`) and open the Integrity Console (`http://localhost:5175/#/integrity`). `npm test` also exercises this: `demo/test/m1.test.js`–`m13.browser.test.js` include the live integrity check, and `cde/test/phase5.test.js` independently tests the locked analysis code in isolation from any input-order concern.

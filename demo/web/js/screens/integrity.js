@@ -1,5 +1,6 @@
 import { api, el } from '../api.js';
 import { createIntegrityChain } from '../components/integrityChain.js';
+import { createOrderSensitivityPanel } from '../components/orderSensitivity.js';
 import { scene, RESOLVE_STEP_MS } from '../visual/scene.js';
 import { staggerIn, prefersReducedMotion } from '../visual/motion.js';
 
@@ -28,7 +29,11 @@ export async function renderIntegrity(main) {
   verifySection.appendChild(resultsBox);
   main.appendChild(verifySection);
 
-  staggerIn([idPanel, verifySection], { each: 80, from: 8 });
+  const sensitivity = createOrderSensitivityPanel();
+  sensitivity.style.marginTop = '18px';
+  main.appendChild(sensitivity);
+
+  staggerIn([idPanel, verifySection, sensitivity], { each: 80, from: 8 });
   scene.setMode('integrity');
 
   let resolveTimers = [];

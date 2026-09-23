@@ -14,6 +14,7 @@ const path = require('path');
 
 const dataLoader = require('./dataLoader');
 const integrity = require('./integrity');
+const orderSensitivity = require('./orderSensitivity');
 const tamper = require('./tamper');
 const provenance = require('./provenance');
 const baseline = require('./baseline');
@@ -159,6 +160,11 @@ route('POST', '/api/integrity/verify', (req, res) => {
   // and every preflight check (~seconds), it does not simulate a delay.
   const result = integrity.verifyExperiment();
   sendJson(res, 200, result);
+});
+
+route('GET', '/api/reproducibility/order-sensitivity', (req, res) => {
+  // Real computation (the locked analysis, re-run in memory under several input orders); cached after the first call.
+  sendJson(res, 200, orderSensitivity.orderSensitivity());
 });
 
 route('GET', '/api/tamper/scenarios', (req, res) => {
