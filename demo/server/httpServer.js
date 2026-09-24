@@ -21,7 +21,9 @@ const baseline = require('./baseline');
 const timeline = require('./timeline');
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
-const PORT = Number(process.env.DEMO_PORT || 5175);
+// PORT is what most hosting platforms inject automatically; DEMO_PORT is this project's own
+// override for local use. Either works; DEMO_PORT wins if both happen to be set.
+const PORT = Number(process.env.DEMO_PORT || process.env.PORT || 5175);
 
 // The two browser libraries come from npm, not a CDN. Only these two
 // directories of node_modules are exposed, read-only, and only .js files —

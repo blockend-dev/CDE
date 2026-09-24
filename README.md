@@ -49,6 +49,7 @@ The only thing that differs between the two members of a pair is whether the cla
 | DiD (`exposureDelta`) | **−0.0025** |
 | 95% CI (bootstrap) | **[−0.0075, 0.0000]** |
 | Permutation p (two-sided, 10,000 permutations, seed 424242) | **0.4909** |
+| Directional flips | **0** of 21 weekday pairs; **0** of 20 weekend pairs |
 
 **In plain English:** the observed estimate is small, and the current sample does not provide strong statistical evidence of a non-zero difference between conditions.
 
@@ -117,13 +118,31 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module map, data flow, and w
 
 **CDE does not currently claim integration with Bitget Agent Hub, MCP, Playbook, or Agentic Trading APIs.** No such integration exists in this repository. If this is read as a gap against the Agentic Trading track's toolchain, that gap is real and stated here rather than implied away.
 
+## Bitget Demo execution — validated separately, and why it isn't part of CDE's result
+
+Before concluding that CDE could not be extended into real paper trading, we tested directly rather than assumed. This is kept strictly separate from CDE's frozen research; nothing below changes, motivates, or is blended into the 41-pair result above.
+
+**Demo execution genuinely works.** Using authenticated Bitget UTA v3 Demo credentials, a real market buy and market sell on `BTCUSDT` both filled successfully — order `1486690999181099008` (buy, 0.000118 BTC @ 84254.33) and order `1486691329188937728` (the closing sell). This is real, working infrastructure: genuine authentication, signing, order placement, fills, and position closure — not a mock.
+
+**Real-world-asset (rToken) execution does not.** Bitget's Demo instrument catalog does list several rToken/tokenized-stock symbols — `RQQQUSDT`, `RSPYUSDT`, `RMUUSDT`, `RGOOGLUSDT`, among others — and four of those are literally in the frozen precondition study's own 85-symbol universe (`research/weekend-informativeness/output/raw_dataset.json`), not just similarly named. But every order placed against them, market or limit, is rejected identically:
+
+```text
+POST /api/v3/trade/place-order  {category: SPOT, symbol: RQQQUSDT, orderType: market, side: buy, qty: "10"}
+-> 400  code 25200  "papTradingService not support RWA order validation error"
+```
+
+Reproduced on `RQQQUSDT` (both market and limit order types), `RGOOGLUSDT`, `RMUUSDT`, and `RSPYUSDT` (market). The error names the paper-trading *service*, not the account or a specific symbol — a platform-wide restriction, not a configuration problem on our end. `RAAPLUSDT` and `RAAOIUSDT` — the two symbols CDE's frozen research actually uses — aren't in Bitget's Demo catalog at all (`online` on live; `40034 "Parameter RAAPLUSDT does not exist"` on Demo).
+
+**What this means, plainly:** a scientifically faithful extension of CDE into real Bitget paper trading isn't currently possible, because the entire instrument class the research question depends on — tokenized real-world equities — can't be paper-traded on Bitget today. We could have produced trading metrics anyway by substituting `BTCUSDT`, but those numbers would say nothing about weekday/weekend corroboration availability, since BTCUSDT trades continuously with no comparable NYSE-linked information gap. We did not make that substitution, and no BTCUSDT metric anywhere in this repository is presented as evidence toward CDE's research question.
+
 ## What CDE does NOT do
 
-- Does not execute trades, live or paper.
+- CDE itself does not execute trades, live or paper — no order originates from the research pipeline or the demo. The one paper trade referenced above (`BTCUSDT`) was a separate, direct infrastructure validation, not something CDE's agent, pipeline, or demo performed or was asked to perform.
 - Does not claim profitability. There is no P&L, Sharpe, Sortino, drawdown, or win-rate figure anywhere in this repository.
 - Does not produce live trading signals.
 - Does not claim weekend prices are uninformative — see [The question](#the-question).
-- Does not use a live Bitget trading account.
+- Does not use a live (real-money) Bitget trading account — the execution validation above used a Demo/paper account exclusively.
+- Does not present the `BTCUSDT` Demo trade, or any BTC-derived figure, as evidence toward CDE's research question.
 - Does not use live API calls in Judge Mode, or anywhere else in the demo.
 - Does not claim Bitget MCP, Agent Hub, or Playbook integration.
 

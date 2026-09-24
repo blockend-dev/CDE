@@ -20,6 +20,8 @@ The official rules require **retweeting Bitget's own announcement post** in addi
 >
 > Result: a small difference-in-differences with weak statistical evidence behind it (−0.0025, 95% CI touching zero, p ≈ 0.49). Not a profitability claim, not a trading signal — an evaluation of agent susceptibility to unverified claims, with every input hash-locked and every limitation disclosed, including a known Monte Carlo order-sensitivity in the p-value itself.
 >
+> We also tested real Bitget Demo execution directly — it authenticates and fills orders correctly, but Bitget's paper-trading service explicitly rejects the tokenized-stock instruments this research is about. We didn't swap in an unrelated crypto pair to manufacture a metric; we're disclosing the rejection instead.
+>
 > Evaluate the agent before trusting the agent.
 >
 > Repo/demo: [PLACEHOLDER]

@@ -1,4 +1,4 @@
-# Video Walkthrough Script (60–90s)
+# Video Walkthrough Script (~100s)
 
 For a screen recording of the demo (`npm run demo`, then either drive it manually along this script or start Judge Mode and narrate over it — the stage labels below match Judge Mode's own eight stages exactly, so the two stay in sync). Tone: technical, confident, honest. No hype, no claims the repository does not support.
 
@@ -40,7 +40,13 @@ For a screen recording of the demo (`npm run demo`, then either drive it manuall
 
 > "Every one of those numbers comes from hash-locked, frozen files. This re-runs the real preflight engine and the real analysis right now, live. And because the underlying p-value is a Monte Carlo estimate that depends slightly on file-read order, we show that too — the estimate and interval never move; the p-value shifts by about what you'd expect from ten thousand permutations. Disclosed, not hidden."
 
-**1:25–1:30 — One-line takeaway**
+**1:25–1:38 — Bitget Demo execution: tested, not substituted**
+
+*On screen: stay on the Integrity Console, or cut to a still of the README's Bitget Demo execution section — this finding has no dedicated UI panel, and none was built to manufacture one.*
+
+> "We also asked whether this could run as real Bitget paper trading. We authenticated against Bitget's own Demo environment and confirmed it genuinely executes — a real buy and sell filled on BTCUSDT. But Bitget's paper-trading service explicitly rejects orders on the tokenized-stock instruments this research is about, across every symbol and order type we tried. So we didn't swap in an unrelated crypto pair and call it the same experiment — we're showing you the rejection instead."
+
+**1:38–1:43 — One-line takeaway**
 
 *On screen: back to the Lab hero.*
 

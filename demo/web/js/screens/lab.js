@@ -140,7 +140,7 @@ export async function renderLab(main) {
         el('div', { class: 'col-header' }, 'How to read this'),
         el('p', {}, 'The observed difference is small, and this sample does not provide strong statistical evidence of a non-zero condition difference.'),
         el('p', {}, 'Because the study is small and no power analysis was performed, this should not be interpreted as evidence that no effect exists.'),
-        el('p', { class: 'mono context' }, `Context, counted from the frozen trials: exposure differed between Clean and Injected in ${d.pairsWithNonzeroExposureDelta} of ${d.pairsTotal} pairs; direction changed in ${d.pairsWithDirectionFlip} of ${d.pairsTotal}; the model chose a non-neutral direction in ${d.trialsNonNeutral} of ${d.trialsTotal} trials. The estimate is carried by the ${d.pairsWithNonzeroExposureDelta} pair(s) in which exposure changed at all.`),
+        el('p', { class: 'mono context' }, `Context, counted from the frozen trials: exposure differed between Clean and Injected in ${d.pairsWithNonzeroExposureDelta} of ${d.pairsTotal} pairs; direction changed in ${d.pairsWithDirectionFlip} of ${d.pairsTotal} (${Math.round(data.secondaryDescriptive.weekdayDirectionalFlipRate * p.pointEstimate.weekdayN)} of ${p.pointEstimate.weekdayN} weekday, ${Math.round(data.secondaryDescriptive.weekendDirectionalFlipRate * p.pointEstimate.weekendN)} of ${p.pointEstimate.weekendN} weekend); the model chose a non-neutral direction in ${d.trialsNonNeutral} of ${d.trialsTotal} trials. The estimate is carried by the ${d.pairsWithNonzeroExposureDelta} pair(s) in which exposure changed at all.`),
         el('p', { class: 'mono context' }, [
           `The p-value is a seeded Monte Carlo estimate and moves slightly with the order the trial files are read in; the estimate and interval do not. `,
           el('a', { href: '#/integrity' }, 'See Reproducibility →'),
@@ -176,7 +176,7 @@ export async function renderLab(main) {
 
   main.appendChild(
     el('div', { class: 'footer-note' }, [
-      'This experiment used replayed historical market data, never live Bitget or demo trading — no order was ever placed. "Exposure" is the agent\'s self-reported intended position size, a signed number in [-1, 1], never a profit, return, or P&L figure. No hidden model reasoning is captured or shown anywhere in this instrument — see ',
+      'This experiment used replayed historical market data — CDE itself never called Bitget or placed an order, live or demo. "Exposure" is the agent\'s self-reported intended position size, a signed number in [-1, 1], never a profit, return, or P&L figure. No hidden model reasoning is captured or shown anywhere in this instrument — see ',
       el('span', { class: 'mono' }, 'Evidence X-Ray'),
       ' for exactly what was recorded.',
     ])

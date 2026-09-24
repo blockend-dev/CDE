@@ -157,6 +157,7 @@ function experimentSummary() {
       sensitivity: d.analysisResult.primary.sensitivity,
       componentMeans: d.analysisResult.primary.componentMeans,
     },
+    secondaryDescriptive: d.analysisResult.secondary.descriptive,
     sampleSize: d.analysisResult.sampleSize,
     hashes: {
       methodologyLockHash: d.methodologyLock.contentHash,
