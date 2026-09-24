@@ -122,7 +122,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module map, data flow, and w
 
 This section reports what was directly tested rather than assumed, before concluding CDE could not be extended into real paper trading. It is kept strictly separate from CDE's frozen research; nothing below changes, motivates, or is blended into the 41-pair result above.
 
-**Demo execution genuinely works.** Using authenticated Bitget UTA v3 Demo credentials, a real market buy and market sell on `BTCUSDT` both filled successfully — order `1486690999181099008` (buy, 0.000118 BTC @ 84254.33) and order `1486691329188937728` (the closing sell). This is real, working infrastructure: genuine authentication, signing, order placement, fills, and position closure — not a mock.
+**Demo execution genuinely works.** Using authenticated Bitget UTA v3 Demo credentials, real market buy/sell round trips on `BTCUSDT` filled successfully — 12 orders across 6 pairs in total, order `1486690999181099008` (the first buy) through order `1486971686056513536` (the last sell). This is real, working infrastructure: genuine authentication, signing, order placement, fills, and position closure — not a mock. Full per-order timestamps, prices, quantities, and the measured account balance change are in [PAPER_TRADING_LOG.md](PAPER_TRADING_LOG.md).
 
 **Real-world-asset (rToken) execution does not.** Bitget's Demo instrument catalog does list several rToken/tokenized-stock symbols — `RQQQUSDT`, `RSPYUSDT`, `RMUUSDT`, `RGOOGLUSDT`, among others — and four of those are literally in the frozen precondition study's own 85-symbol universe (`research/weekend-informativeness/output/raw_dataset.json`), not just similarly named. But every order placed against them, market or limit, is rejected identically:
 
@@ -137,12 +137,12 @@ Reproduced on `RQQQUSDT` (both market and limit order types), `RGOOGLUSDT`, `RMU
 
 ## What CDE does NOT do
 
-- CDE itself does not execute trades, live or paper — no order originates from the research pipeline or the demo. The one paper trade referenced above (`BTCUSDT`) was a separate, direct infrastructure validation, not something CDE's agent, pipeline, or demo performed or was asked to perform.
+- CDE itself does not execute trades, live or paper — no order originates from the research pipeline or the demo. The paper trades referenced above (`BTCUSDT`, [PAPER_TRADING_LOG.md](PAPER_TRADING_LOG.md)) were a separate, direct infrastructure validation, not something CDE's agent, pipeline, or demo performed or was asked to perform.
 - Does not claim profitability. There is no P&L, Sharpe, Sortino, drawdown, or win-rate figure anywhere in this repository.
 - Does not produce live trading signals.
 - Does not claim weekend prices are uninformative — see [The question](#the-question).
 - Does not use a live (real-money) Bitget trading account — the execution validation above used a Demo/paper account exclusively.
-- Does not present the `BTCUSDT` Demo trade, or any BTC-derived figure, as evidence toward CDE's research question.
+- Does not present the `BTCUSDT` Demo trades, or any BTC-derived figure, as evidence toward CDE's research question.
 - Does not use live API calls in Judge Mode, or anywhere else in the demo.
 - Does not claim Bitget MCP, Agent Hub, or Playbook integration.
 
