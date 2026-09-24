@@ -14,6 +14,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const dataLoader = require('./dataLoader');
+const gitBootStatus = require('./gitBootStatus');
 const integrity = require('./integrity');
 const orderSensitivity = require('./orderSensitivity');
 const tamper = require('./tamper');
@@ -39,11 +40,14 @@ const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
 function unshallowIfNeeded() {
   try {
     const isShallow = execSync('git rev-parse --is-shallow-repository', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim() === 'true';
+    gitBootStatus.record({ attempted: true, wasShallow: isShallow });
     if (!isShallow) return;
     console.log('Shallow git checkout detected — fetching full history...');
     execSync('git fetch --unshallow', { cwd: REPO_ROOT, shell: GIT_SHELL, stdio: 'pipe', timeout: 20000 });
+    gitBootStatus.record({ unshallowed: true });
     console.log('Full git history fetched.');
   } catch (err) {
+    gitBootStatus.record({ unshallowed: false, error: err.message });
     console.log(`Could not fetch full git history at boot — continuing on recorded-data fallbacks: ${err.message}`);
   }
 }

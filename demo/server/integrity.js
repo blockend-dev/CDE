@@ -17,6 +17,7 @@ const { runResearchAnalysis } = require('../../cde/phase5/runResearchAnalysis');
 const dataLoader = require('./dataLoader');
 const RECORDED_TRIAL_ORDER = require('./analysisInputOrder.json').trials;
 const LOCKED_METRICS_MANIFEST = require('./lockedMetricsHash.json');
+const gitBootStatus = require('./gitBootStatus');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
@@ -187,6 +188,7 @@ function verifyExperiment() {
       detail: {
         shallowCloneDetected: true,
         note: "This host's git checkout is shallow, so git log can't see real history and always names the latest commit as 'touching' these files — see gitHistoryCheck below. Falling back to a direct content-hash comparison of the same locked files against the frozen record.",
+        bootUnshallowAttempt: gitBootStatus.state,
         gitHistoryCheck: checks[historyCheckIndex].detail,
         contentHashCheck: { matchesFrozenRecord: contentMatchesFrozenRecord, current: currentHash, frozenRecord: LOCKED_METRICS_MANIFEST.combinedHash },
       },
