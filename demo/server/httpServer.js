@@ -40,12 +40,23 @@ const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
 function unshallowIfNeeded() {
   try {
     const isShallow = execSync('git rev-parse --is-shallow-repository', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim() === 'true';
-    gitBootStatus.record({ attempted: true, wasShallow: isShallow });
+    const remotes = execSync('git remote -v', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
+    const head = execSync('git rev-parse --abbrev-ref HEAD', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
+    gitBootStatus.record({ attempted: true, wasShallow: isShallow, remotes, head });
     if (!isShallow) return;
     console.log('Shallow git checkout detected — fetching full history...');
-    execSync('git fetch --unshallow', { cwd: REPO_ROOT, shell: GIT_SHELL, stdio: 'pipe', timeout: 20000 });
-    gitBootStatus.record({ unshallowed: true });
-    console.log('Full git history fetched.');
+    let fetchOutput = '';
+    try {
+      fetchOutput = execSync('git fetch --unshallow 2>&1', { cwd: REPO_ROOT, shell: GIT_SHELL, timeout: 20000 }).toString();
+    } catch (fetchErr) {
+      // execSync throws on nonzero exit even with 2>&1 captured; keep whatever output it produced.
+      fetchOutput = (fetchErr.stdout ? fetchErr.stdout.toString() : '') + fetchErr.message;
+    }
+    // The fetch subprocess can exit 0 without actually deepening history it was told to (e.g. a
+    // detached HEAD with no matching remote branch) — trust a fresh check, not the fetch's own exit code.
+    const isShallowAfter = execSync('git rev-parse --is-shallow-repository', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim() === 'true';
+    gitBootStatus.record({ unshallowed: !isShallowAfter, isShallowAfterFetch: isShallowAfter, fetchOutput });
+    console.log(isShallowAfter ? `Fetch ran but repo is still shallow. Output: ${fetchOutput}` : 'Full git history fetched.');
   } catch (err) {
     gitBootStatus.record({ unshallowed: false, error: err.message });
     console.log(`Could not fetch full git history at boot — continuing on recorded-data fallbacks: ${err.message}`);
