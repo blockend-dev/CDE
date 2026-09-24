@@ -166,6 +166,11 @@ function summarize(name, detail) {
   if (name === 'no_duplicate_identities') return { uniqueTrialKeys: detail.uniqueTrialKeys, uniquePairingKeys: detail.uniquePairingKeys, uniqueSnapshotIds: detail.uniqueSnapshotIds };
   if (name === 'provenance_reproducible_and_honest') return { checkedTrials: detail.checkedTrials, issues: detail.issues.length };
   if (name === 'pairing_invariants_hold') return { violations: Array.isArray(detail) ? detail.length : 0 };
+  // Surfaced verbatim so a failure here is always diagnosable from the API response rather than
+  // silently swallowed — this check's own detail already distinguishes "an unexpected commit
+  // touched the locked files" (touchingCommits/unexpected) from "the git query itself failed"
+  // (error), which matter for very different reasons and should never look identical to a reader.
+  if (name === 'no_phase4_or_5_redefinition_of_locked_metrics') return detail;
   return undefined;
 }
 
