@@ -2,3 +2,9 @@ node_modules/
 .env
 *.log
 .claude/
+
+# Internal drafting/prep material for actions taken outside the repo
+# (posting, recording, filling the submission form) — kept locally, not published.
+/SUBMISSION.md
+/VIDEO_SCRIPT.md
+/X_POST.md

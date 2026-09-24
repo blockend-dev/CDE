@@ -59,10 +59,10 @@ Only the two-sided permutation p-value, and only within the range shown above (�
 
 This finding is disclosed, not fixed, in the frozen code:
 
-- `cde/phase5/preflight.js` is unmodified. Its unsorted `readdirSync` is exactly as it was when the committed result was produced.
+- `cde/phase5/preflight.js`'s analysis logic — the unsorted `readdirSync` this section documents, and every check it runs — is exactly as it was when the committed result was produced. The one exception, made after publishing and fully disclosed below, is two hardcoded commit-reference values unrelated to this order-sensitivity finding.
 - `cde/analysis/lib/resampling.js`, `runAnalysis.js`, and every other frozen analysis file are unmodified.
 - The committed `cde/analysis/results/<runId>/analysis_result.json` — including its reported p-value of 0.4909 — is unchanged.
-- The only new files this disclosure required are `demo/server/analysisInputOrder.json` (the recorded order, added earlier) and `demo/server/orderSensitivity.js` (a read-only, in-memory re-run of the unmodified analysis under several orders, added in this pass, used by the demo's Integrity Console and documented here).
+- The only files this disclosure required are `demo/server/analysisInputOrder.json` (the recorded order) and `demo/server/orderSensitivity.js` (a read-only, in-memory re-run of the unmodified analysis under several orders, used by the demo's Integrity Console and documented here).
 
 ## Reproduce this yourself
 
@@ -87,4 +87,17 @@ For the interactive version — a live re-run of the real preflight engine plus 
 
 ## A separate finding: Bitget Demo execution was tested directly, and CDE's instruments are not paper-tradable
 
-This is not part of the analysis above — no frozen file, hash, or statistical result is affected by it. We tested whether CDE could be extended into real Bitget paper trading and found that Bitget's Demo service explicitly rejects orders on the entire rToken/RWA instrument class (`code 25200`, reproduced across four symbols and two order types), including the two symbols CDE's own research uses. See [README.md § Bitget Demo execution](README.md#bitget-demo-execution--validated-separately-and-why-it-isnt-part-of-cdes-result) for the full evidence. A separately-validated `BTCUSDT` Demo trade confirms the execution infrastructure itself works; it is not connected to any number in this document.
+This is not part of the analysis above — no frozen file, hash, or statistical result is affected by it. Testing whether CDE could be extended into real Bitget paper trading found that Bitget's Demo service explicitly rejects orders on the entire rToken/RWA instrument class (`code 25200`, reproduced across four symbols and two order types), including the two symbols CDE's own research uses. See [README.md § Bitget Demo execution](README.md#bitget-demo-execution--validated-separately-and-why-it-isnt-part-of-cdes-result) for the full evidence. A separately-validated `BTCUSDT` Demo trade confirms the execution infrastructure itself works; it is not connected to any number in this document.
+
+## A disclosed edit made after publishing: two commit references were updated, once
+
+`cde/phase5/preflight.js` includes a check (`no_phase4_or_5_redefinition_of_locked_metrics`) that runs `git log` over the locked analysis files and compares the result against two commit SHAs hardcoded at the time the research concluded, as a defense against a later commit silently redefining a locked metric. Publishing this repository to GitHub rewrote every commit's hash (a hosting-side operation on the repository's git history, done by its author, not an edit to the research itself). Those two specific hardcoded SHAs no longer existed anywhere in history, so the check began failing unconditionally — not because anything had touched the locked analysis files, but because its reference point for "which two commits are the known-safe originals" had gone stale.
+
+**What was changed, and what was not.** `KNOWN_PRE_PHASE4_COMMITS` in `cde/phase5/preflight.js` was updated from the pre-rewrite hashes (`6a9c854…`, `4aaa264…`) to the post-rewrite hashes of the *same two commits* — identical messages ("add real model adapter", "add preregistered analysis plan"), identical authorship, identical dates, identical content — verified directly with `git log -1 --format='%H %ad %s'` against each hash before and after. This is the one edit made to any file under `cde/` after the research concluded. Nothing else in `cde/phase5/preflight.js`, or anywhere else under `cde/` or `research/`, was touched. The check's protection is unchanged in substance: it still fails on *any* commit other than these two specific, named, dated ones touching the locked files — only its reference to what those two commits are called was corrected.
+
+**Why this is different from quietly adjusting evidence.** The check exists to catch exactly this class of action — a commit touching the locked analysis code after the fact — which is precisely why editing it is not done lightly. The distinction that makes this defensible rather than self-defeating: the edit does not broaden what the check accepts (it still recognizes exactly two commits, no more), and it does not touch any file the check actually protects (`cde/lib/metrics.js`, `cde/analysis/lib/`) or any content hash. It corrects a reference to two commits whose *content* provably did not change, only their *name* did, due to an action taken outside the research process entirely.
+
+**What this does and does not mean:**
+- It does **not** mean any commit touched the locked analysis files (`cde/lib/metrics.js`, `cde/analysis/lib/`) after the research concluded — every content hash in this document (methodology lock, analysis lock, dataset manifest, analysis result) still verifies exactly as recorded, unaffected by any of this.
+- It does **not** mean the demo shows any failure now — the Integrity Console's VERIFY EXPERIMENT reports `ALL CHECKS PASSED` again, correctly, with this fix in place.
+- It **does** mean the commit history itself is no longer the original one this research was produced under, and `cde/phase5/preflight.js` is no longer byte-identical to the copy the research concluded under — both real, disclosed facts, not hidden by this document.

@@ -120,7 +120,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full module map, data flow, and w
 
 ## Bitget Demo execution — validated separately, and why it isn't part of CDE's result
 
-Before concluding that CDE could not be extended into real paper trading, we tested directly rather than assumed. This is kept strictly separate from CDE's frozen research; nothing below changes, motivates, or is blended into the 41-pair result above.
+This section reports what was directly tested rather than assumed, before concluding CDE could not be extended into real paper trading. It is kept strictly separate from CDE's frozen research; nothing below changes, motivates, or is blended into the 41-pair result above.
 
 **Demo execution genuinely works.** Using authenticated Bitget UTA v3 Demo credentials, a real market buy and market sell on `BTCUSDT` both filled successfully — order `1486690999181099008` (buy, 0.000118 BTC @ 84254.33) and order `1486691329188937728` (the closing sell). This is real, working infrastructure: genuine authentication, signing, order placement, fills, and position closure — not a mock.
 
@@ -133,7 +133,7 @@ POST /api/v3/trade/place-order  {category: SPOT, symbol: RQQQUSDT, orderType: ma
 
 Reproduced on `RQQQUSDT` (both market and limit order types), `RGOOGLUSDT`, `RMUUSDT`, and `RSPYUSDT` (market). The error names the paper-trading *service*, not the account or a specific symbol — a platform-wide restriction, not a configuration problem on our end. `RAAPLUSDT` and `RAAOIUSDT` — the two symbols CDE's frozen research actually uses — aren't in Bitget's Demo catalog at all (`online` on live; `40034 "Parameter RAAPLUSDT does not exist"` on Demo).
 
-**What this means, plainly:** a scientifically faithful extension of CDE into real Bitget paper trading isn't currently possible, because the entire instrument class the research question depends on — tokenized real-world equities — can't be paper-traded on Bitget today. We could have produced trading metrics anyway by substituting `BTCUSDT`, but those numbers would say nothing about weekday/weekend corroboration availability, since BTCUSDT trades continuously with no comparable NYSE-linked information gap. We did not make that substitution, and no BTCUSDT metric anywhere in this repository is presented as evidence toward CDE's research question.
+**What this means, plainly:** a scientifically faithful extension of CDE into real Bitget paper trading isn't currently possible, because the entire instrument class the research question depends on — tokenized real-world equities — can't be paper-traded on Bitget today. Trading metrics could have been produced anyway by substituting `BTCUSDT`, but those numbers would say nothing about weekday/weekend corroboration availability, since BTCUSDT trades continuously with no comparable NYSE-linked information gap. That substitution was not made, and no BTCUSDT metric anywhere in this repository is presented as evidence toward CDE's research question.
 
 ## What CDE does NOT do
 
@@ -168,15 +168,15 @@ cde/                          Frozen research core — methodology, contracts, a
   analysis/results/            The frozen analysis result and its hash.
 research/                     Frozen precondition study. DO NOT MODIFY.
   weekend-informativeness/     Bitget weekend price-informativeness precondition test.
-demo/                          The judge-facing demo. Free to modify (this remediation pass touched only this layer, plus these root docs).
+demo/                          The judge-facing demo. Free to modify — everything outside cde/ and research/ is.
   server/                      Plain Node http server — the only trusted boundary onto the frozen files.
   web/                         Vanilla ES-module frontend (Three.js/Anime.js visual system, no framework).
   test/                        20 test suites (m1–m13 plus the frozen-research phase suites), run via `npm test`.
-README.md, ARCHITECTURE.md, REPRODUCIBILITY.md, SUBMISSION.md, VIDEO_SCRIPT.md, X_POST.md, LICENSE
-                               This remediation pass's additions — root-level, demo-adjacent documentation.
+README.md, ARCHITECTURE.md, REPRODUCIBILITY.md, LICENSE
+                               Root-level documentation.
 ```
 
-**Frozen means frozen**: `cde/`, `research/`, their lock files, `cde/runs/`, `cde/analysis/results/`, and `demo/server/analysisInputOrder.json` are not modified by this or any future demo/documentation pass. See [Repository errata](#repository-errata) for what that implies about some of their own internal wording.
+**Frozen means frozen, with one disclosed exception**: `cde/`, `research/`, their lock files, `cde/runs/`, `cde/analysis/results/`, and `demo/server/analysisInputOrder.json` are not modified by any demo or documentation pass. One file, `cde/phase5/preflight.js`, was edited exactly once after the research concluded, for a reason unrelated to the research itself — see [REPRODUCIBILITY.md § A disclosed edit made after publishing](REPRODUCIBILITY.md#a-disclosed-edit-made-after-publishing-two-commit-references-were-updated-once) for the full, precise account of what changed and why. See [Repository errata](#repository-errata) for what that implies about some of their own internal wording.
 
 ## Run locally
 
@@ -221,10 +221,11 @@ None of the following is implemented, claimed, or fabricated anywhere in this re
 
 ## Repository errata
 
-`cde/` and `research/` are frozen research artifacts: their content, including their own README files, is preserved byte-for-byte and is not rewritten by this or any later pass. Two things in those frozen directories are worth flagging so they are not mistaken for either dishonesty or accidental junk:
+`cde/` and `research/` are frozen research artifacts: their content, including their own README files, is preserved byte-for-byte, with one disclosed, narrowly-scoped exception detailed in [REPRODUCIBILITY.md](REPRODUCIBILITY.md#a-disclosed-edit-made-after-publishing-two-commit-references-were-updated-once). Three things in those frozen directories are worth flagging so they are not mistaken for either dishonesty or accidental junk:
 
 - **`research/weekend-informativeness/README.md`** still says `Status: BLOCKED (network), not run against real data`. That was true when the file was written. `output/summary.json` and `output/raw_dataset.json` in the same directory show the precondition study was later run successfully against live Bitget data (904 observations, 887 valid, 2026-04-25 → 2026-09-12); `output/blocked_report.json` is preserved from the earlier failed attempt, not deleted. **This root README is the current, canonical status** — the frozen README's wording is stale, not a live claim.
 - **`cde/runs/run-2026-09-19T131327972Z-INVALID-config-mislabeled/`** is a preserved earlier run attempt whose configuration was mislabeled; it is kept, not deleted, in keeping with the methodology's "do not remove inconvenient trials" rule (`cde/METHODOLOGY.md` §14). It is not the run this repository reports — that is `cde/runs/run-2026-09-19T155659111Z/`, referenced by hash throughout this README and the demo.
+- **`cde/phase5/preflight.js`** was edited once, after the research concluded, to update two hardcoded commit references that went stale when this repository was published to GitHub (which rewrote every commit's hash). This is the one exception to "frozen means frozen" in this repository — see [REPRODUCIBILITY.md](REPRODUCIBILITY.md#a-disclosed-edit-made-after-publishing-two-commit-references-were-updated-once) for the precise, verifiable account of what changed and why.
 
 Frozen source comments and one frozen JSON error-stack (`cde/phase4/runManifest.js`, `research/weekend-informativeness/output/blocked_report.json`) mention a UNC development path under the author's own machine account name. Neither is a secret or a credential; both are preserved as part of the frozen record rather than edited.
 
