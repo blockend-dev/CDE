@@ -20,7 +20,12 @@ const { buildCandidateQueues } = require('../phase4/population');
 const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const LOCKED_ANALYSIS_FILES = ['cde/lib/metrics.js', 'cde/analysis/lib'];
-const KNOWN_PRE_PHASE4_COMMITS = new Set(['6a9c85427b231a98f6113bc1aa2023ab33262a8e', '4aaa264807fda997d179225a909a516a1ed3be03']);
+// Updated 2026-09-24: publishing this repository to GitHub rewrote every commit's hash. These are
+// the SAME two original commits (identical messages/authors/dates/content — "add preregistered
+// analysis plan" and "add real model adapter") under their new post-rewrite hashes, not a broadened
+// exemption. This is the one documented edit to any file under cde/ after the research concluded —
+// see REPRODUCIBILITY.md for the full account and the original hashes this replaces.
+const KNOWN_PRE_PHASE4_COMMITS = new Set(['79560ebfccbcf2c919dfd8ed670b84317af94d9e', 'dcebe8f1918807d812589d3df315f95162552603']);
 
 function runGit(args) {
   return execSync(`git ${args}`, { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
