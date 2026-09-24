@@ -3,6 +3,14 @@ node_modules/
 *.log
 .claude/
 
+# Disposable scratch run directories cde/test/*.test.js creates under cde/runs/ (test-*, never
+# the real run-2026-... directories). These were always meant to be as invisible to git as
+# node_modules/ above — on a genuinely clean checkout, leaving them untracked made a frozen
+# idempotency test's own working-tree-cleanliness check see the tree as "dirty" the second time
+# it ran (once its own first-run scratch output existed), producing two different manifest
+# hashes for what should be an identical, deterministic manifest. See REPRODUCIBILITY.md.
+cde/runs/test-*/
+
 # Internal drafting/prep material for actions taken outside the repo
 # (posting, recording, filling the submission form) — kept locally, not published.
 /SUBMISSION.md
