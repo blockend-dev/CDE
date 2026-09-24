@@ -11,6 +11,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const dataLoader = require('./dataLoader');
 const integrity = require('./integrity');
@@ -19,6 +20,33 @@ const tamper = require('./tamper');
 const provenance = require('./provenance');
 const baseline = require('./baseline');
 const timeline = require('./timeline');
+
+const REPO_ROOT = path.join(__dirname, '..', '..');
+const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
+
+/**
+ * Some hosts (Render confirmed) shallow-clone (`git fetch --depth=1`) by
+ * default, which breaks any `git log -- <path>` historical query — both
+ * cde/phase5/preflight.js's integrity checks and this demo's Timeline screen
+ * rely on real commit history. Converting to a full clone once at boot fixes
+ * this at the root instead of only working around it. If it can't (no
+ * remote reachable, outbound network blocked, etc.), nothing here depends on
+ * it succeeding: demo/server/integrity.js still falls back to an independent
+ * content hash (lockedMetricsHash.json) and demo/server/timeline.js reads
+ * recorded commit data (timelineCommits.json) rather than a live git query.
+ * See REPRODUCIBILITY.md.
+ */
+function unshallowIfNeeded() {
+  try {
+    const isShallow = execSync('git rev-parse --is-shallow-repository', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim() === 'true';
+    if (!isShallow) return;
+    console.log('Shallow git checkout detected — fetching full history...');
+    execSync('git fetch --unshallow', { cwd: REPO_ROOT, shell: GIT_SHELL, stdio: 'pipe', timeout: 20000 });
+    console.log('Full git history fetched.');
+  } catch (err) {
+    console.log(`Could not fetch full git history at boot — continuing on recorded-data fallbacks: ${err.message}`);
+  }
+}
 
 const WEB_ROOT = path.join(__dirname, '..', 'web');
 // PORT is what most hosting platforms inject automatically; DEMO_PORT is this project's own
@@ -208,6 +236,7 @@ function handle(req, res) {
 }
 
 function start(port = PORT) {
+  unshallowIfNeeded();
   const server = http.createServer(handle);
   server.listen(port, () => {
     console.log(`CDE demo server listening on http://localhost:${port}`);

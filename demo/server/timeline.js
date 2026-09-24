@@ -2,48 +2,40 @@
 /**
  * Experiment Timeline — every entry is derived from real repository state
  * (the actual commit that first introduced each phase's marker file, and
- * the real lock/hash values), never hand-typed prose dates. Mirrors
- * cde/phase4/runManifest.js's GIT_SHELL workaround for UNC-path git calls.
+ * the real lock/hash values), never hand-typed prose dates.
+ *
+ * Commit metadata comes from timelineCommits.json, recorded once from a
+ * full-history local clone, rather than a live `git log` at request time.
+ * Many deploy platforms (Render confirmed) shallow-clone (`--depth=1`) by
+ * default, under which `git log -- <path>` can only see the single fetched
+ * commit and would silently report it as having introduced every file —
+ * this is display-only content, not a tamper-detection check, so recording
+ * the real, independently-verifiable answer once is strictly more correct
+ * than a live query that depends on the deploy environment's history depth.
+ * See REPRODUCIBILITY.md.
  */
 
-const { execSync } = require('child_process');
-const path = require('path');
 const fs = require('fs');
 
 const dataLoader = require('./dataLoader');
+const RECORDED = require('./timelineCommits.json').byKey;
 
-const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
-const REPO_ROOT = path.join(__dirname, '..', '..');
-
-function runGit(args) {
-  return execSync(`git ${args}`, { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
-}
-
-function firstCommitAdding(relPath) {
-  const out = runGit(`log --diff-filter=A --format=%H -- "${relPath}"`);
-  if (!out) return null;
-  const lines = out.split('\n').filter(Boolean);
-  return lines[lines.length - 1]; // oldest
-}
-
-function commitMeta(sha) {
-  if (!sha) return null;
-  const out = runGit(`show -s --format=%H%x1f%s%x1f%cI "${sha}"`);
-  const [hash, subject, date] = out.split('\x1f');
-  return { sha: hash, subject, date };
+function commitMeta(entry) {
+  if (!entry) return null;
+  return { sha: entry.sha, subject: entry.subject, date: entry.date };
 }
 
 function buildTimeline() {
   const d = dataLoader.load();
 
-  const phase0Sha = firstCommitAdding('cde/methodology.lock.json');
-  const phase1Sha = firstCommitAdding('cde/phase1/README.md');
-  const phase2Sha = firstCommitAdding('cde/phase2/config.js');
-  const phasesBundled = phase0Sha === phase1Sha && phase1Sha === phase2Sha;
-  const phase3Sha = firstCommitAdding('cde/analysis/analysis.lock.json');
-  const phase4FirstSha = firstCommitAdding('cde/phase4/population.js');
-  const phase4DatasetSha = firstCommitAdding(`cde/runs/${dataLoader.RUN_ID}/manifest.json`);
-  const phase5Sha = firstCommitAdding(`cde/analysis/results/${dataLoader.RUN_ID}/analysis_result.json`);
+  const phase0Sha = RECORDED.phase0;
+  const phase1Sha = RECORDED.phase1;
+  const phase2Sha = RECORDED.phase2;
+  const phasesBundled = phase0Sha.sha === phase1Sha.sha && phase1Sha.sha === phase2Sha.sha;
+  const phase3Sha = RECORDED.phase3;
+  const phase4FirstSha = RECORDED.phase4First;
+  const phase4DatasetSha = RECORDED.phase4Dataset;
+  const phase5Sha = RECORDED.phase5;
 
   return [
     {

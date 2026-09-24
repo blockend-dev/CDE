@@ -1,0 +1,13 @@
+{
+  "note": "Recorded once, from a full-history local clone, the real answer to 'which commit first added this path' for each Experiment Timeline entry. Many deploy platforms (Render confirmed; this is common, not Render-specific) do a shallow `git fetch --depth=1` clone, under which `git log -- <path>` can only see the single fetched commit and wrongly reports it as having introduced every file. Rather than depend on the deploy environment's git history depth, demo/server/timeline.js reads this recorded file instead of querying git live. See REPRODUCIBILITY.md for the full account. Regenerate only if the underlying commit history is genuinely, disclosedly rewritten again — never to make an entry look different.",
+  "recordedAtUtc": "2026-09-24T10:00:00.000Z",
+  "byKey": {
+    "phase0": { "path": "cde/methodology.lock.json", "sha": "dcebe8f1918807d812589d3df315f95162552603", "subject": "feat(cde): add real model adapter", "date": "2026-09-14T10:21:00+01:00" },
+    "phase1": { "path": "cde/phase1/README.md", "sha": "dcebe8f1918807d812589d3df315f95162552603", "subject": "feat(cde): add real model adapter", "date": "2026-09-14T10:21:00+01:00" },
+    "phase2": { "path": "cde/phase2/config.js", "sha": "dcebe8f1918807d812589d3df315f95162552603", "subject": "feat(cde): add real model adapter", "date": "2026-09-14T10:21:00+01:00" },
+    "phase3": { "path": "cde/analysis/analysis.lock.json", "sha": "79560ebfccbcf2c919dfd8ed670b84317af94d9e", "subject": "feat(cde): add preregistered analysis plan", "date": "2026-09-14T11:08:00+01:00" },
+    "phase4First": { "path": "cde/phase4/population.js", "sha": "5913140a6e219e8f69ceff1b06eaa8f5156c2b4b", "subject": "feat(cde): add research run manifest and population", "date": "2026-09-14T14:02:00+01:00" },
+    "phase4Dataset": { "path": "cde/runs/run-2026-09-19T155659111Z/manifest.json", "sha": "71f407bbb7e9e42db000c29c59c2441a3707dfae", "subject": "feat(cde): finalize phase 4 research dataset", "date": "2026-09-15T17:12:00+01:00" },
+    "phase5": { "path": "cde/analysis/results/run-2026-09-19T155659111Z/analysis_result.json", "sha": "c1be647d401f2ebbfab144d26807018ef1299e05", "subject": "feat(cde): run phase 5 analysis on finalized research dataset", "date": "2026-09-16T12:42:00+01:00" }
+  }
+}

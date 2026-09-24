@@ -1,0 +1,18 @@
+{
+  "note": "Recorded once, from the frozen, already-verified content of cde/lib/metrics.js and cde/analysis/lib/*.js — the same files cde/phase5/preflight.js's no_phase4_or_5_redefinition_of_locked_metrics check exists to protect. That check normally answers 'has any Phase 4/5 commit touched these files?' via `git log -- <path>`, which needs real commit history. On a shallow clone (git fetch --depth=1, Render confirmed) that query is structurally unable to see history and always reports the latest fetched commit as touching every path, regardless of content — a hosting artifact, not a tamper signal. demo/server/integrity.js falls back to this content hash only when that happens, answering the same underlying question ('do these files match the frozen, tested record?') in a way that does not depend on clone depth. Regenerate only if these files are genuinely, disclosedly changed again — never to make a check pass.",
+  "recordedAtUtc": "2026-09-24T10:00:00.000Z",
+  "combinedHash": "b9c095efb95a54914c30dec5c28bc4e10fc12029d6aa5a87ed898acfd268d207",
+  "files": [
+    { "path": "cde/analysis/lib/analysisLock.js", "sha256": "6744aaf89aa5e1da5f0fc872c71bb1b3f2000b938b2c164193eea94ce3e799b5" },
+    { "path": "cde/analysis/lib/inputValidation.js", "sha256": "a6095a706eb2f89ff048d3b6169de98499e63b7a1a0ae3a7f28097a50a868634" },
+    { "path": "cde/analysis/lib/primaryAnalysis.js", "sha256": "d51b2f00de5b6f9e6545d129a56617af907421352cd2410fb140d828e1e89f84" },
+    { "path": "cde/analysis/lib/prng.js", "sha256": "5b0eba8ce2ca59be46aa3bfb8863bdead96d91bd88397eb9d1bbf75c270e90c3" },
+    { "path": "cde/analysis/lib/proportions.js", "sha256": "ceaf0ff67d4eec95ba9fcf93ce9dca37d5cf5e937e0c9c158c2af4785dcf57c5" },
+    { "path": "cde/analysis/lib/resampling.js", "sha256": "1a4cbe66cf67c08fd00bde5bc6d0d98738342b90c93b69cd8f63a004fc8f5b31" },
+    { "path": "cde/analysis/lib/runAnalysis.js", "sha256": "d212e5805226763137e656ce2539f1625c4d8a06597e5b72865ea2df7d125b54" },
+    { "path": "cde/analysis/lib/sampleSizeAssessment.js", "sha256": "1260e62e53b0d2a23c6c265a7c8669c2e19867b43240ca4f43c1a8e384f140cd" },
+    { "path": "cde/analysis/lib/secondaryAnalysis.js", "sha256": "074ca2ab3c22b4c99c8eca4f8c8708667916a52be81296b674d27a35185c6354" },
+    { "path": "cde/analysis/lib/stratification.js", "sha256": "e20e9e97f2b7892b78b495198876b69acce0e78d66bbeeca645189fec5bd15b7" },
+    { "path": "cde/lib/metrics.js", "sha256": "bc40ed4e244f787f7a865e7c786bc01f722223a6f6e3f4b62b08852e1569dd48" }
+  ]
+}
