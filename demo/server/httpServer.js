@@ -37,13 +37,32 @@ const GIT_SHELL = process.platform === 'win32' ? 'bash.exe' : undefined;
  * recorded commit data (timelineCommits.json) rather than a live git query.
  * See REPRODUCIBILITY.md.
  */
+// The project's real, already-public GitHub URL (the same one disclosed throughout
+// README.md/REPRODUCIBILITY.md) — used ONLY as a fallback fetch source when a deploy
+// host's checkout has no remote configured at all, never to override one that exists.
+const PUBLIC_ORIGIN_URL = 'https://github.com/blockend-dev/CDE.git';
+
 function unshallowIfNeeded() {
   try {
     const isShallow = execSync('git rev-parse --is-shallow-repository', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim() === 'true';
-    const remotes = execSync('git remote -v', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
+    let remotes = execSync('git remote -v', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
     const head = execSync('git rev-parse --abbrev-ref HEAD', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
     gitBootStatus.record({ attempted: true, wasShallow: isShallow, remotes, head });
     if (!isShallow) return;
+
+    let addedPublicOrigin = false;
+    if (!remotes) {
+      // Some hosts (Render confirmed) fetch a shallow checkout with no remote configured at
+      // all, so there is nothing for `git fetch --unshallow` to fetch from. Point it at this
+      // repository's own public URL — read-only, fetch-only, and never persisted anywhere
+      // that would affect a real push.
+      console.log('No git remote configured — adding the public origin before attempting to unshallow...');
+      execSync(`git remote add origin ${PUBLIC_ORIGIN_URL}`, { cwd: REPO_ROOT, shell: GIT_SHELL });
+      remotes = execSync('git remote -v', { cwd: REPO_ROOT, shell: GIT_SHELL }).toString().trim();
+      addedPublicOrigin = true;
+      gitBootStatus.record({ remotes, addedPublicOrigin });
+    }
+
     console.log('Shallow git checkout detected — fetching full history...');
     let fetchOutput = '';
     try {
