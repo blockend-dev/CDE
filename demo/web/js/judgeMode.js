@@ -1,4 +1,4 @@
-import { el, api } from './api.js';
+import { el, api, pickInterestingPair } from './api.js';
 import { createReplayNotice } from './components/replayNotice.js';
 import { slideUp, swapText, prefersReducedMotion } from './visual/motion.js';
 
@@ -47,18 +47,6 @@ function clickButton(text) {
   const btn = [...document.querySelectorAll('button')].find((b) => b.textContent.includes(text));
   if (btn) btn.click();
   return !!btn;
-}
-
-async function pickInterestingPair() {
-  try {
-    const { pairs } = await api('/pairs?changed=true');
-    if (pairs.length > 0) {
-      pairs.sort((a, b) => Math.abs(b.exposureDelta) - Math.abs(a.exposureDelta) || Math.abs(b.confidenceDelta) - Math.abs(a.confidenceDelta));
-      return pairs[0].pairingKey;
-    }
-  } catch (_) {}
-  const { pairs: all } = await api('/pairs');
-  return all[0].pairingKey;
 }
 
 const pad = (n) => String(n).padStart(2, '0');

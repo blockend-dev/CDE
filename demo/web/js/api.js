@@ -29,6 +29,25 @@ export async function api(pathAndQuery, opts) {
   return body;
 }
 
+/**
+ * The single "most demonstrative" pair — largest structured-decision change,
+ * falling back to the first pair if none changed. Shared by judgeMode.js's
+ * scripted walkthrough and pairDetail.js's bare `#/pair` landing (no key
+ * selected yet), so both pick the same real example the same way rather than
+ * each guessing independently.
+ */
+export async function pickInterestingPair() {
+  try {
+    const { pairs } = await api('/pairs?changed=true');
+    if (pairs.length > 0) {
+      pairs.sort((a, b) => Math.abs(b.exposureDelta) - Math.abs(a.exposureDelta) || Math.abs(b.confidenceDelta) - Math.abs(a.confidenceDelta));
+      return pairs[0].pairingKey;
+    }
+  } catch (_) {}
+  const { pairs: all } = await api('/pairs');
+  return all[0].pairingKey;
+}
+
 export function shortHash(h, n = 10) {
   if (!h) return '—';
   return `${h.slice(0, n)}…`;

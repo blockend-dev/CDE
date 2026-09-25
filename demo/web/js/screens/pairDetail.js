@@ -1,10 +1,9 @@
-import { api, el, clickable, shortHash, fmtNum } from '../api.js';
+import { api, el, clickable, shortHash, fmtNum, pickInterestingPair } from '../api.js';
 import { renderCounterfactualTab } from './tabs/counterfactual.js';
 import { renderChainTab } from './tabs/chain.js';
 import { renderXrayTab } from './tabs/xray.js';
 import { renderProvenanceTab } from './tabs/provenance.js';
 import { renderBaselineTab } from './tabs/baseline.js';
-import { renderCaseFiles } from './casefiles.js';
 import { scene } from '../visual/scene.js';
 import { staggerIn } from '../visual/motion.js';
 
@@ -63,10 +62,20 @@ function pairBanner(pair) {
 
 export async function renderPairDetail(main, rest) {
   const parts = decodeURIComponent(rest || '').split('?')[0].split('/').filter(Boolean);
-  const pairingKey = parts[0];
-  const tabKey = parts[1] || 'counterfactual';
+  let pairingKey = parts[0];
+  let tabKey = parts[1] || 'counterfactual';
 
-  if (!pairingKey) return renderCaseFiles(main);
+  // "Counterfactual Lab" in the sidenav links to the bare `#/pair` (no key
+  // yet chosen) — that used to fall through to the exact same screen as
+  // "Case Files", making the two nav items indistinguishable. Landing here
+  // now resolves to one real, demonstrative pair instead, and updates the
+  // address bar to name it (replaceState: no extra history entry, no second
+  // hashchange/render pass).
+  if (!pairingKey) {
+    pairingKey = await pickInterestingPair();
+    tabKey = 'counterfactual';
+    history.replaceState(null, '', `#/pair/${pairingKey}/${tabKey}`);
+  }
 
   main.appendChild(el('div', { class: 'loading' }, 'Loading pair…'));
   let pair;
@@ -83,7 +92,7 @@ export async function renderPairDetail(main, rest) {
   main.appendChild(
     el('div', { style: 'display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:10px;' }, [
       el('h1', {}, `${pair.symbol} — ${pair.condition.toUpperCase()}`),
-      el('a', { href: '#/pair', class: 'btn ghost mono', style: 'font-size:11px;' }, '← All pairs'),
+      el('a', { href: '#/cases', class: 'btn ghost mono', style: 'font-size:11px;' }, '← All pairs'),
     ])
   );
 
